@@ -197,6 +197,15 @@ export const CampaignStatus: {
 
 export type CampaignStatus = (typeof CampaignStatus)[keyof typeof CampaignStatus]
 
+
+export const CalendarItemType: {
+  EVENT: 'EVENT',
+  TASK: 'TASK',
+  APPOINTMENT: 'APPOINTMENT'
+};
+
+export type CalendarItemType = (typeof CalendarItemType)[keyof typeof CalendarItemType]
+
 }
 
 export type UserRole = $Enums.UserRole
@@ -222,6 +231,10 @@ export const InvoiceStatus: typeof $Enums.InvoiceStatus
 export type CampaignStatus = $Enums.CampaignStatus
 
 export const CampaignStatus: typeof $Enums.CampaignStatus
+
+export type CalendarItemType = $Enums.CalendarItemType
+
+export const CalendarItemType: typeof $Enums.CalendarItemType
 
 /**
  * ##  Prisma Client ʲˢ
@@ -22227,8 +22240,18 @@ export namespace Prisma {
 
   export type AggregateCalendarEvent = {
     _count: CalendarEventCountAggregateOutputType | null
+    _avg: CalendarEventAvgAggregateOutputType | null
+    _sum: CalendarEventSumAggregateOutputType | null
     _min: CalendarEventMinAggregateOutputType | null
     _max: CalendarEventMaxAggregateOutputType | null
+  }
+
+  export type CalendarEventAvgAggregateOutputType = {
+    reminders: number | null
+  }
+
+  export type CalendarEventSumAggregateOutputType = {
+    reminders: number[]
   }
 
   export type CalendarEventMinAggregateOutputType = {
@@ -22241,6 +22264,11 @@ export namespace Prisma {
     description: string | null
     createdById: string | null
     createdAt: Date | null
+    type: $Enums.CalendarItemType | null
+    allDay: boolean | null
+    location: string | null
+    completed: boolean | null
+    seriesId: string | null
   }
 
   export type CalendarEventMaxAggregateOutputType = {
@@ -22253,6 +22281,11 @@ export namespace Prisma {
     description: string | null
     createdById: string | null
     createdAt: Date | null
+    type: $Enums.CalendarItemType | null
+    allDay: boolean | null
+    location: string | null
+    completed: boolean | null
+    seriesId: string | null
   }
 
   export type CalendarEventCountAggregateOutputType = {
@@ -22265,9 +22298,24 @@ export namespace Prisma {
     description: number
     createdById: number
     createdAt: number
+    type: number
+    allDay: number
+    location: number
+    reminders: number
+    completed: number
+    seriesId: number
+    metadata: number
     _all: number
   }
 
+
+  export type CalendarEventAvgAggregateInputType = {
+    reminders?: true
+  }
+
+  export type CalendarEventSumAggregateInputType = {
+    reminders?: true
+  }
 
   export type CalendarEventMinAggregateInputType = {
     id?: true
@@ -22279,6 +22327,11 @@ export namespace Prisma {
     description?: true
     createdById?: true
     createdAt?: true
+    type?: true
+    allDay?: true
+    location?: true
+    completed?: true
+    seriesId?: true
   }
 
   export type CalendarEventMaxAggregateInputType = {
@@ -22291,6 +22344,11 @@ export namespace Prisma {
     description?: true
     createdById?: true
     createdAt?: true
+    type?: true
+    allDay?: true
+    location?: true
+    completed?: true
+    seriesId?: true
   }
 
   export type CalendarEventCountAggregateInputType = {
@@ -22303,6 +22361,13 @@ export namespace Prisma {
     description?: true
     createdById?: true
     createdAt?: true
+    type?: true
+    allDay?: true
+    location?: true
+    reminders?: true
+    completed?: true
+    seriesId?: true
+    metadata?: true
     _all?: true
   }
 
@@ -22344,6 +22409,18 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
+     * Select which fields to average
+    **/
+    _avg?: CalendarEventAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: CalendarEventSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
      * Select which fields to find the minimum value
     **/
     _min?: CalendarEventMinAggregateInputType
@@ -22374,6 +22451,8 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: CalendarEventCountAggregateInputType | true
+    _avg?: CalendarEventAvgAggregateInputType
+    _sum?: CalendarEventSumAggregateInputType
     _min?: CalendarEventMinAggregateInputType
     _max?: CalendarEventMaxAggregateInputType
   }
@@ -22388,7 +22467,16 @@ export namespace Prisma {
     description: string | null
     createdById: string | null
     createdAt: Date
+    type: $Enums.CalendarItemType
+    allDay: boolean
+    location: string | null
+    reminders: number[]
+    completed: boolean
+    seriesId: string | null
+    metadata: JsonValue | null
     _count: CalendarEventCountAggregateOutputType | null
+    _avg: CalendarEventAvgAggregateOutputType | null
+    _sum: CalendarEventSumAggregateOutputType | null
     _min: CalendarEventMinAggregateOutputType | null
     _max: CalendarEventMaxAggregateOutputType | null
   }
@@ -22417,6 +22505,13 @@ export namespace Prisma {
     description?: boolean
     createdById?: boolean
     createdAt?: boolean
+    type?: boolean
+    allDay?: boolean
+    location?: boolean
+    reminders?: boolean
+    completed?: boolean
+    seriesId?: boolean
+    metadata?: boolean
     organization?: boolean | OrganizationDefaultArgs<ExtArgs>
     createdBy?: boolean | CalendarEvent$createdByArgs<ExtArgs>
   }, ExtArgs["result"]["calendarEvent"]>
@@ -22431,6 +22526,13 @@ export namespace Prisma {
     description?: boolean
     createdById?: boolean
     createdAt?: boolean
+    type?: boolean
+    allDay?: boolean
+    location?: boolean
+    reminders?: boolean
+    completed?: boolean
+    seriesId?: boolean
+    metadata?: boolean
     organization?: boolean | OrganizationDefaultArgs<ExtArgs>
     createdBy?: boolean | CalendarEvent$createdByArgs<ExtArgs>
   }, ExtArgs["result"]["calendarEvent"]>
@@ -22445,6 +22547,13 @@ export namespace Prisma {
     description?: boolean
     createdById?: boolean
     createdAt?: boolean
+    type?: boolean
+    allDay?: boolean
+    location?: boolean
+    reminders?: boolean
+    completed?: boolean
+    seriesId?: boolean
+    metadata?: boolean
     organization?: boolean | OrganizationDefaultArgs<ExtArgs>
     createdBy?: boolean | CalendarEvent$createdByArgs<ExtArgs>
   }, ExtArgs["result"]["calendarEvent"]>
@@ -22459,9 +22568,16 @@ export namespace Prisma {
     description?: boolean
     createdById?: boolean
     createdAt?: boolean
+    type?: boolean
+    allDay?: boolean
+    location?: boolean
+    reminders?: boolean
+    completed?: boolean
+    seriesId?: boolean
+    metadata?: boolean
   }
 
-  export type CalendarEventOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "organizationId" | "title" | "start" | "end" | "level" | "description" | "createdById" | "createdAt", ExtArgs["result"]["calendarEvent"]>
+  export type CalendarEventOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "organizationId" | "title" | "start" | "end" | "level" | "description" | "createdById" | "createdAt" | "type" | "allDay" | "location" | "reminders" | "completed" | "seriesId" | "metadata", ExtArgs["result"]["calendarEvent"]>
   export type CalendarEventInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     organization?: boolean | OrganizationDefaultArgs<ExtArgs>
     createdBy?: boolean | CalendarEvent$createdByArgs<ExtArgs>
@@ -22491,6 +22607,13 @@ export namespace Prisma {
       description: string | null
       createdById: string | null
       createdAt: Date
+      type: $Enums.CalendarItemType
+      allDay: boolean
+      location: string | null
+      reminders: number[]
+      completed: boolean
+      seriesId: string | null
+      metadata: Prisma.JsonValue | null
     }, ExtArgs["result"]["calendarEvent"]>
     composites: {}
   }
@@ -22925,6 +23048,13 @@ export namespace Prisma {
     readonly description: FieldRef<"CalendarEvent", 'String'>
     readonly createdById: FieldRef<"CalendarEvent", 'String'>
     readonly createdAt: FieldRef<"CalendarEvent", 'DateTime'>
+    readonly type: FieldRef<"CalendarEvent", 'CalendarItemType'>
+    readonly allDay: FieldRef<"CalendarEvent", 'Boolean'>
+    readonly location: FieldRef<"CalendarEvent", 'String'>
+    readonly reminders: FieldRef<"CalendarEvent", 'Int[]'>
+    readonly completed: FieldRef<"CalendarEvent", 'Boolean'>
+    readonly seriesId: FieldRef<"CalendarEvent", 'String'>
+    readonly metadata: FieldRef<"CalendarEvent", 'Json'>
   }
     
 
@@ -31175,7 +31305,14 @@ export namespace Prisma {
     level: 'level',
     description: 'description',
     createdById: 'createdById',
-    createdAt: 'createdAt'
+    createdAt: 'createdAt',
+    type: 'type',
+    allDay: 'allDay',
+    location: 'location',
+    reminders: 'reminders',
+    completed: 'completed',
+    seriesId: 'seriesId',
+    metadata: 'metadata'
   };
 
   export type CalendarEventScalarFieldEnum = (typeof CalendarEventScalarFieldEnum)[keyof typeof CalendarEventScalarFieldEnum]
@@ -31463,6 +31600,20 @@ export namespace Prisma {
    * Reference to a field of type 'InvoiceStatus[]'
    */
   export type ListEnumInvoiceStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InvoiceStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'CalendarItemType'
+   */
+  export type EnumCalendarItemTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CalendarItemType'>
+    
+
+
+  /**
+   * Reference to a field of type 'CalendarItemType[]'
+   */
+  export type ListEnumCalendarItemTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CalendarItemType[]'>
     
 
 
@@ -32656,6 +32807,13 @@ export namespace Prisma {
     description?: StringNullableFilter<"CalendarEvent"> | string | null
     createdById?: StringNullableFilter<"CalendarEvent"> | string | null
     createdAt?: DateTimeFilter<"CalendarEvent"> | Date | string
+    type?: EnumCalendarItemTypeFilter<"CalendarEvent"> | $Enums.CalendarItemType
+    allDay?: BoolFilter<"CalendarEvent"> | boolean
+    location?: StringNullableFilter<"CalendarEvent"> | string | null
+    reminders?: IntNullableListFilter<"CalendarEvent">
+    completed?: BoolFilter<"CalendarEvent"> | boolean
+    seriesId?: StringNullableFilter<"CalendarEvent"> | string | null
+    metadata?: JsonNullableFilter<"CalendarEvent">
     organization?: XOR<OrganizationScalarRelationFilter, OrganizationWhereInput>
     createdBy?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
   }
@@ -32670,6 +32828,13 @@ export namespace Prisma {
     description?: SortOrderInput | SortOrder
     createdById?: SortOrderInput | SortOrder
     createdAt?: SortOrder
+    type?: SortOrder
+    allDay?: SortOrder
+    location?: SortOrderInput | SortOrder
+    reminders?: SortOrder
+    completed?: SortOrder
+    seriesId?: SortOrderInput | SortOrder
+    metadata?: SortOrderInput | SortOrder
     organization?: OrganizationOrderByWithRelationInput
     createdBy?: UserOrderByWithRelationInput
   }
@@ -32687,6 +32852,13 @@ export namespace Prisma {
     description?: StringNullableFilter<"CalendarEvent"> | string | null
     createdById?: StringNullableFilter<"CalendarEvent"> | string | null
     createdAt?: DateTimeFilter<"CalendarEvent"> | Date | string
+    type?: EnumCalendarItemTypeFilter<"CalendarEvent"> | $Enums.CalendarItemType
+    allDay?: BoolFilter<"CalendarEvent"> | boolean
+    location?: StringNullableFilter<"CalendarEvent"> | string | null
+    reminders?: IntNullableListFilter<"CalendarEvent">
+    completed?: BoolFilter<"CalendarEvent"> | boolean
+    seriesId?: StringNullableFilter<"CalendarEvent"> | string | null
+    metadata?: JsonNullableFilter<"CalendarEvent">
     organization?: XOR<OrganizationScalarRelationFilter, OrganizationWhereInput>
     createdBy?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
   }, "id">
@@ -32701,9 +32873,18 @@ export namespace Prisma {
     description?: SortOrderInput | SortOrder
     createdById?: SortOrderInput | SortOrder
     createdAt?: SortOrder
+    type?: SortOrder
+    allDay?: SortOrder
+    location?: SortOrderInput | SortOrder
+    reminders?: SortOrder
+    completed?: SortOrder
+    seriesId?: SortOrderInput | SortOrder
+    metadata?: SortOrderInput | SortOrder
     _count?: CalendarEventCountOrderByAggregateInput
+    _avg?: CalendarEventAvgOrderByAggregateInput
     _max?: CalendarEventMaxOrderByAggregateInput
     _min?: CalendarEventMinOrderByAggregateInput
+    _sum?: CalendarEventSumOrderByAggregateInput
   }
 
   export type CalendarEventScalarWhereWithAggregatesInput = {
@@ -32719,6 +32900,13 @@ export namespace Prisma {
     description?: StringNullableWithAggregatesFilter<"CalendarEvent"> | string | null
     createdById?: StringNullableWithAggregatesFilter<"CalendarEvent"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"CalendarEvent"> | Date | string
+    type?: EnumCalendarItemTypeWithAggregatesFilter<"CalendarEvent"> | $Enums.CalendarItemType
+    allDay?: BoolWithAggregatesFilter<"CalendarEvent"> | boolean
+    location?: StringNullableWithAggregatesFilter<"CalendarEvent"> | string | null
+    reminders?: IntNullableListFilter<"CalendarEvent">
+    completed?: BoolWithAggregatesFilter<"CalendarEvent"> | boolean
+    seriesId?: StringNullableWithAggregatesFilter<"CalendarEvent"> | string | null
+    metadata?: JsonNullableWithAggregatesFilter<"CalendarEvent">
   }
 
   export type CampaignWhereInput = {
@@ -34368,6 +34556,13 @@ export namespace Prisma {
     level?: string | null
     description?: string | null
     createdAt?: Date | string
+    type?: $Enums.CalendarItemType
+    allDay?: boolean
+    location?: string | null
+    reminders?: CalendarEventCreateremindersInput | number[]
+    completed?: boolean
+    seriesId?: string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
     organization: OrganizationCreateNestedOneWithoutCalendarEventsInput
     createdBy?: UserCreateNestedOneWithoutCalendarEventsInput
   }
@@ -34382,6 +34577,13 @@ export namespace Prisma {
     description?: string | null
     createdById?: string | null
     createdAt?: Date | string
+    type?: $Enums.CalendarItemType
+    allDay?: boolean
+    location?: string | null
+    reminders?: CalendarEventCreateremindersInput | number[]
+    completed?: boolean
+    seriesId?: string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type CalendarEventUpdateInput = {
@@ -34392,6 +34594,13 @@ export namespace Prisma {
     level?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumCalendarItemTypeFieldUpdateOperationsInput | $Enums.CalendarItemType
+    allDay?: BoolFieldUpdateOperationsInput | boolean
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    reminders?: CalendarEventUpdateremindersInput | number[]
+    completed?: BoolFieldUpdateOperationsInput | boolean
+    seriesId?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
     organization?: OrganizationUpdateOneRequiredWithoutCalendarEventsNestedInput
     createdBy?: UserUpdateOneWithoutCalendarEventsNestedInput
   }
@@ -34406,6 +34615,13 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     createdById?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumCalendarItemTypeFieldUpdateOperationsInput | $Enums.CalendarItemType
+    allDay?: BoolFieldUpdateOperationsInput | boolean
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    reminders?: CalendarEventUpdateremindersInput | number[]
+    completed?: BoolFieldUpdateOperationsInput | boolean
+    seriesId?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type CalendarEventCreateManyInput = {
@@ -34418,6 +34634,13 @@ export namespace Prisma {
     description?: string | null
     createdById?: string | null
     createdAt?: Date | string
+    type?: $Enums.CalendarItemType
+    allDay?: boolean
+    location?: string | null
+    reminders?: CalendarEventCreateremindersInput | number[]
+    completed?: boolean
+    seriesId?: string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type CalendarEventUpdateManyMutationInput = {
@@ -34428,6 +34651,13 @@ export namespace Prisma {
     level?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumCalendarItemTypeFieldUpdateOperationsInput | $Enums.CalendarItemType
+    allDay?: BoolFieldUpdateOperationsInput | boolean
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    reminders?: CalendarEventUpdateremindersInput | number[]
+    completed?: BoolFieldUpdateOperationsInput | boolean
+    seriesId?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type CalendarEventUncheckedUpdateManyInput = {
@@ -34440,6 +34670,13 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     createdById?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumCalendarItemTypeFieldUpdateOperationsInput | $Enums.CalendarItemType
+    allDay?: BoolFieldUpdateOperationsInput | boolean
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    reminders?: CalendarEventUpdateremindersInput | number[]
+    completed?: BoolFieldUpdateOperationsInput | boolean
+    seriesId?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type CampaignCreateInput = {
@@ -36023,6 +36260,21 @@ export namespace Prisma {
     updatedAt?: SortOrder
   }
 
+  export type EnumCalendarItemTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.CalendarItemType | EnumCalendarItemTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.CalendarItemType[] | ListEnumCalendarItemTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.CalendarItemType[] | ListEnumCalendarItemTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumCalendarItemTypeFilter<$PrismaModel> | $Enums.CalendarItemType
+  }
+
+  export type IntNullableListFilter<$PrismaModel = never> = {
+    equals?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    has?: number | IntFieldRefInput<$PrismaModel> | null
+    hasEvery?: number[] | ListIntFieldRefInput<$PrismaModel>
+    hasSome?: number[] | ListIntFieldRefInput<$PrismaModel>
+    isEmpty?: boolean
+  }
+
   export type UserNullableScalarRelationFilter = {
     is?: UserWhereInput | null
     isNot?: UserWhereInput | null
@@ -36038,6 +36290,17 @@ export namespace Prisma {
     description?: SortOrder
     createdById?: SortOrder
     createdAt?: SortOrder
+    type?: SortOrder
+    allDay?: SortOrder
+    location?: SortOrder
+    reminders?: SortOrder
+    completed?: SortOrder
+    seriesId?: SortOrder
+    metadata?: SortOrder
+  }
+
+  export type CalendarEventAvgOrderByAggregateInput = {
+    reminders?: SortOrder
   }
 
   export type CalendarEventMaxOrderByAggregateInput = {
@@ -36050,6 +36313,11 @@ export namespace Prisma {
     description?: SortOrder
     createdById?: SortOrder
     createdAt?: SortOrder
+    type?: SortOrder
+    allDay?: SortOrder
+    location?: SortOrder
+    completed?: SortOrder
+    seriesId?: SortOrder
   }
 
   export type CalendarEventMinOrderByAggregateInput = {
@@ -36062,6 +36330,25 @@ export namespace Prisma {
     description?: SortOrder
     createdById?: SortOrder
     createdAt?: SortOrder
+    type?: SortOrder
+    allDay?: SortOrder
+    location?: SortOrder
+    completed?: SortOrder
+    seriesId?: SortOrder
+  }
+
+  export type CalendarEventSumOrderByAggregateInput = {
+    reminders?: SortOrder
+  }
+
+  export type EnumCalendarItemTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.CalendarItemType | EnumCalendarItemTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.CalendarItemType[] | ListEnumCalendarItemTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.CalendarItemType[] | ListEnumCalendarItemTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumCalendarItemTypeWithAggregatesFilter<$PrismaModel> | $Enums.CalendarItemType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumCalendarItemTypeFilter<$PrismaModel>
+    _max?: NestedEnumCalendarItemTypeFilter<$PrismaModel>
   }
 
   export type EnumCampaignStatusFilter<$PrismaModel = never> = {
@@ -38258,6 +38545,10 @@ export namespace Prisma {
     update?: XOR<XOR<ClientUpdateToOneWithWhereWithoutSubscriptionInput, ClientUpdateWithoutSubscriptionInput>, ClientUncheckedUpdateWithoutSubscriptionInput>
   }
 
+  export type CalendarEventCreateremindersInput = {
+    set: number[]
+  }
+
   export type OrganizationCreateNestedOneWithoutCalendarEventsInput = {
     create?: XOR<OrganizationCreateWithoutCalendarEventsInput, OrganizationUncheckedCreateWithoutCalendarEventsInput>
     connectOrCreate?: OrganizationCreateOrConnectWithoutCalendarEventsInput
@@ -38268,6 +38559,15 @@ export namespace Prisma {
     create?: XOR<UserCreateWithoutCalendarEventsInput, UserUncheckedCreateWithoutCalendarEventsInput>
     connectOrCreate?: UserCreateOrConnectWithoutCalendarEventsInput
     connect?: UserWhereUniqueInput
+  }
+
+  export type EnumCalendarItemTypeFieldUpdateOperationsInput = {
+    set?: $Enums.CalendarItemType
+  }
+
+  export type CalendarEventUpdateremindersInput = {
+    set?: number[]
+    push?: number | number[]
   }
 
   export type OrganizationUpdateOneRequiredWithoutCalendarEventsNestedInput = {
@@ -38783,6 +39083,23 @@ export namespace Prisma {
     _max?: NestedFloatFilter<$PrismaModel>
   }
 
+  export type NestedEnumCalendarItemTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.CalendarItemType | EnumCalendarItemTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.CalendarItemType[] | ListEnumCalendarItemTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.CalendarItemType[] | ListEnumCalendarItemTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumCalendarItemTypeFilter<$PrismaModel> | $Enums.CalendarItemType
+  }
+
+  export type NestedEnumCalendarItemTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.CalendarItemType | EnumCalendarItemTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.CalendarItemType[] | ListEnumCalendarItemTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.CalendarItemType[] | ListEnumCalendarItemTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumCalendarItemTypeWithAggregatesFilter<$PrismaModel> | $Enums.CalendarItemType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumCalendarItemTypeFilter<$PrismaModel>
+    _max?: NestedEnumCalendarItemTypeFilter<$PrismaModel>
+  }
+
   export type NestedEnumCampaignStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.CampaignStatus | EnumCampaignStatusFieldRefInput<$PrismaModel>
     in?: $Enums.CampaignStatus[] | ListEnumCampaignStatusFieldRefInput<$PrismaModel>
@@ -39036,6 +39353,13 @@ export namespace Prisma {
     level?: string | null
     description?: string | null
     createdAt?: Date | string
+    type?: $Enums.CalendarItemType
+    allDay?: boolean
+    location?: string | null
+    reminders?: CalendarEventCreateremindersInput | number[]
+    completed?: boolean
+    seriesId?: string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
     organization: OrganizationCreateNestedOneWithoutCalendarEventsInput
   }
 
@@ -39048,6 +39372,13 @@ export namespace Prisma {
     level?: string | null
     description?: string | null
     createdAt?: Date | string
+    type?: $Enums.CalendarItemType
+    allDay?: boolean
+    location?: string | null
+    reminders?: CalendarEventCreateremindersInput | number[]
+    completed?: boolean
+    seriesId?: string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type CalendarEventCreateOrConnectWithoutCreatedByInput = {
@@ -39266,6 +39597,13 @@ export namespace Prisma {
     description?: StringNullableFilter<"CalendarEvent"> | string | null
     createdById?: StringNullableFilter<"CalendarEvent"> | string | null
     createdAt?: DateTimeFilter<"CalendarEvent"> | Date | string
+    type?: EnumCalendarItemTypeFilter<"CalendarEvent"> | $Enums.CalendarItemType
+    allDay?: BoolFilter<"CalendarEvent"> | boolean
+    location?: StringNullableFilter<"CalendarEvent"> | string | null
+    reminders?: IntNullableListFilter<"CalendarEvent">
+    completed?: BoolFilter<"CalendarEvent"> | boolean
+    seriesId?: StringNullableFilter<"CalendarEvent"> | string | null
+    metadata?: JsonNullableFilter<"CalendarEvent">
   }
 
   export type OrganizationMembershipCreateWithoutOrganizationInput = {
@@ -39626,6 +39964,13 @@ export namespace Prisma {
     level?: string | null
     description?: string | null
     createdAt?: Date | string
+    type?: $Enums.CalendarItemType
+    allDay?: boolean
+    location?: string | null
+    reminders?: CalendarEventCreateremindersInput | number[]
+    completed?: boolean
+    seriesId?: string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
     createdBy?: UserCreateNestedOneWithoutCalendarEventsInput
   }
 
@@ -39638,6 +39983,13 @@ export namespace Prisma {
     description?: string | null
     createdById?: string | null
     createdAt?: Date | string
+    type?: $Enums.CalendarItemType
+    allDay?: boolean
+    location?: string | null
+    reminders?: CalendarEventCreateremindersInput | number[]
+    completed?: boolean
+    seriesId?: string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type CalendarEventCreateOrConnectWithoutOrganizationInput = {
@@ -43770,6 +44122,13 @@ export namespace Prisma {
     level?: string | null
     description?: string | null
     createdAt?: Date | string
+    type?: $Enums.CalendarItemType
+    allDay?: boolean
+    location?: string | null
+    reminders?: CalendarEventCreateremindersInput | number[]
+    completed?: boolean
+    seriesId?: string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type AccountUpdateWithoutUserInput = {
@@ -43972,6 +44331,13 @@ export namespace Prisma {
     level?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumCalendarItemTypeFieldUpdateOperationsInput | $Enums.CalendarItemType
+    allDay?: BoolFieldUpdateOperationsInput | boolean
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    reminders?: CalendarEventUpdateremindersInput | number[]
+    completed?: BoolFieldUpdateOperationsInput | boolean
+    seriesId?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
     organization?: OrganizationUpdateOneRequiredWithoutCalendarEventsNestedInput
   }
 
@@ -43984,6 +44350,13 @@ export namespace Prisma {
     level?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumCalendarItemTypeFieldUpdateOperationsInput | $Enums.CalendarItemType
+    allDay?: BoolFieldUpdateOperationsInput | boolean
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    reminders?: CalendarEventUpdateremindersInput | number[]
+    completed?: BoolFieldUpdateOperationsInput | boolean
+    seriesId?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type CalendarEventUncheckedUpdateManyWithoutCreatedByInput = {
@@ -43995,6 +44368,13 @@ export namespace Prisma {
     level?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumCalendarItemTypeFieldUpdateOperationsInput | $Enums.CalendarItemType
+    allDay?: BoolFieldUpdateOperationsInput | boolean
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    reminders?: CalendarEventUpdateremindersInput | number[]
+    completed?: BoolFieldUpdateOperationsInput | boolean
+    seriesId?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type OrganizationMembershipCreateManyOrganizationInput = {
@@ -44110,6 +44490,13 @@ export namespace Prisma {
     description?: string | null
     createdById?: string | null
     createdAt?: Date | string
+    type?: $Enums.CalendarItemType
+    allDay?: boolean
+    location?: string | null
+    reminders?: CalendarEventCreateremindersInput | number[]
+    completed?: boolean
+    seriesId?: string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type OrganizationMembershipUpdateWithoutOrganizationInput = {
@@ -44464,6 +44851,13 @@ export namespace Prisma {
     level?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumCalendarItemTypeFieldUpdateOperationsInput | $Enums.CalendarItemType
+    allDay?: BoolFieldUpdateOperationsInput | boolean
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    reminders?: CalendarEventUpdateremindersInput | number[]
+    completed?: BoolFieldUpdateOperationsInput | boolean
+    seriesId?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
     createdBy?: UserUpdateOneWithoutCalendarEventsNestedInput
   }
 
@@ -44476,6 +44870,13 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     createdById?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumCalendarItemTypeFieldUpdateOperationsInput | $Enums.CalendarItemType
+    allDay?: BoolFieldUpdateOperationsInput | boolean
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    reminders?: CalendarEventUpdateremindersInput | number[]
+    completed?: BoolFieldUpdateOperationsInput | boolean
+    seriesId?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type CalendarEventUncheckedUpdateManyWithoutOrganizationInput = {
@@ -44487,6 +44888,13 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     createdById?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    type?: EnumCalendarItemTypeFieldUpdateOperationsInput | $Enums.CalendarItemType
+    allDay?: BoolFieldUpdateOperationsInput | boolean
+    location?: NullableStringFieldUpdateOperationsInput | string | null
+    reminders?: CalendarEventUpdateremindersInput | number[]
+    completed?: BoolFieldUpdateOperationsInput | boolean
+    seriesId?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type ClientCreateManyAssignedToInput = {

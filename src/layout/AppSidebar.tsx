@@ -38,6 +38,11 @@ const navItems: NavItem[] = [
     path: "/calendar",
   },
   {
+    icon: <CalenderIcon />,
+    name: "MUI Calendar",
+    path: "/mui-calendar",
+  },
+  {
     icon: <UserCircleIcon />,
     name: "User Profile",
     path: "/profile",

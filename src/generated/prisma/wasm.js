@@ -284,7 +284,14 @@ exports.Prisma.CalendarEventScalarFieldEnum = {
   level: 'level',
   description: 'description',
   createdById: 'createdById',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  type: 'type',
+  allDay: 'allDay',
+  location: 'location',
+  reminders: 'reminders',
+  completed: 'completed',
+  seriesId: 'seriesId',
+  metadata: 'metadata'
 };
 
 exports.Prisma.CampaignScalarFieldEnum = {
@@ -414,6 +421,12 @@ exports.InteractionType = exports.$Enums.InteractionType = {
 exports.InvoiceStatus = exports.$Enums.InvoiceStatus = {
   paid: 'paid',
   unpaid: 'unpaid'
+};
+
+exports.CalendarItemType = exports.$Enums.CalendarItemType = {
+  EVENT: 'EVENT',
+  TASK: 'TASK',
+  APPOINTMENT: 'APPOINTMENT'
 };
 
 exports.CampaignStatus = exports.$Enums.CampaignStatus = {

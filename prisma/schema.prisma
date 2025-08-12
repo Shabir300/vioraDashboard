@@ -2,7 +2,6 @@
 
 generator client {
   provider = "prisma-client-js"
-   output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -299,9 +298,23 @@ model CalendarEvent {
   description    String?
   createdById    String?
   createdAt      DateTime  @default(now())
+  // New fields for richer calendar features
+  type           CalendarItemType @default(EVENT)
+  allDay         Boolean          @default(false)
+  location       String?
+  reminders      Int[]
+  completed      Boolean          @default(false)
+  seriesId       String?
+  metadata       Json?
 
   organization Organization @relation(fields: [organizationId], references: [id])
   createdBy    User?        @relation("UserCreatedEvents", fields: [createdById], references: [id])
+}
+
+enum CalendarItemType {
+  EVENT
+  TASK
+  APPOINTMENT
 }
 
 model Campaign {

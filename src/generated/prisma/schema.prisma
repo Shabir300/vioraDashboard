@@ -290,7 +290,7 @@ model Subscription {
 }
 
 model CalendarEvent {
-  id             String    @id @default(cuid())
+  id             String           @id @default(cuid())
   organizationId String
   title          String
   start          DateTime
@@ -298,10 +298,24 @@ model CalendarEvent {
   level          String?
   description    String?
   createdById    String?
-  createdAt      DateTime  @default(now())
+  createdAt      DateTime         @default(now())
+  // New fields for richer calendar features
+  type           CalendarItemType @default(EVENT)
+  allDay         Boolean          @default(false)
+  location       String?
+  reminders      Int[]
+  completed      Boolean          @default(false)
+  seriesId       String?
+  metadata       Json?
 
   organization Organization @relation(fields: [organizationId], references: [id])
   createdBy    User?        @relation("UserCreatedEvents", fields: [createdById], references: [id])
+}
+
+enum CalendarItemType {
+  EVENT
+  TASK
+  APPOINTMENT
 }
 
 model Campaign {

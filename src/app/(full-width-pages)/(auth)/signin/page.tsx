@@ -11,6 +11,11 @@ export const metadata: Metadata = {
 
 export default async function SignIn() {
   const session = await getServerSession(authOptions);
-  if (session) redirect("/");
+  if (session) {
+    // If logged in but no org, go to setup to avoid loop
+    // @ts-expect-error custom
+    const orgId = session.organizationId as string | undefined;
+    redirect(orgId ? "/" : "/setup-org");
+  }
   return <SignInForm />;
 }

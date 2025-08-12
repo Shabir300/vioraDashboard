@@ -111,7 +111,7 @@ export default function SignUpForm() {
                     const data = await res.json().catch(() => ({}));
                     throw new Error(data.error || "Registration failed");
                   }
-                  await signIn("credentials", { email, password, callbackUrl: "/dashboard" });
+                  await signIn("credentials", { email, password, callbackUrl: "/" });
                 } catch (err: any) {
                   setError(err.message || "Registration failed");
                 } finally {
@@ -165,7 +165,7 @@ export default function SignUpForm() {
                     />
                   </div>
                   <div>
-                    <Label>Organization Name (optional)</Label>
+                    <Label>Agency Name </Label>
                     <Input
                       type="text"
                       placeholder="Your agency name"
