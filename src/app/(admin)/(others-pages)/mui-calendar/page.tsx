@@ -216,8 +216,8 @@ export default function MuiCalendarPage() {
     if (!detailsEvent) return;
     const id = String(detailsEvent.id);
     setEvents((prev) => prev.filter((e) => String((e as any).id) !== id));
-    // Persist delete
-    fetch(`/api/calendar/${id}`, { method: "DELETE" })
+    // Persist delete (use POST path to avoid DELETE build issues)
+    fetch(`/api/calendar/${id}/delete`, { method: "POST" })
       .then((r) => { if (!r.ok) throw new Error(); setToast({ open: true, message: "Deleted", severity: "success" }); })
       .catch(() => setToast({ open: true, message: "Failed to delete", severity: "error" }));
     closeDetails();
@@ -290,9 +290,9 @@ export default function MuiCalendarPage() {
           },
         } as any;
       }));
-      // Persist
-      fetch(`/api/calendar/${id}`, {
-        method: "PATCH",
+      // Persist (use POST path to avoid PATCH build issues)
+      fetch(`/api/calendar/${id}/update`, {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title: eventTitle,
@@ -370,8 +370,8 @@ export default function MuiCalendarPage() {
           },
         } as any;
       }));
-      fetch(`/api/calendar/${id}`, {
-        method: "PATCH",
+      fetch(`/api/calendar/${id}/update`, {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title: taskCompleted ? `${taskTitle} (Done)` : taskTitle,
