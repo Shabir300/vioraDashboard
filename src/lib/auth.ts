@@ -45,16 +45,17 @@ export const authOptions: NextAuthOptions = {
     signIn: "/signin",
   },
   callbacks: {
-    async jwt({ token, user, account }) {
+    async jwt({ token, user }) {
       // On initial sign in, attach user id
       if (user?.id) {
         token.userId = user.id;
       }
 
       // Attach membership context (first org membership)
-      if (token.userId) {
+      if (typeof token.userId === "string") {
+        const userId = token.userId;
         const membership = await prisma.organizationMembership.findFirst({
-          where: { userId: token.userId },
+          where: { userId },
           include: { organization: true },
         });
         if (membership) {
@@ -62,7 +63,7 @@ export const authOptions: NextAuthOptions = {
           token.orgRole = membership.role;
         }
         const dbUser = await prisma.user.findUnique({
-          where: { id: token.userId },
+          where: { id: userId },
           select: { role: true },
         });
         if (dbUser) token.userRole = dbUser.role;
