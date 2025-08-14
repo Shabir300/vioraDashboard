@@ -1,9 +1,6 @@
 "use client";
 
 import React from "react";
-import PageBreadcrumb from "@/components/common/PageBreadCrumb";
-import { ThemeProvider as MuiThemeProvider, createTheme } from "@mui/material/styles";
-import CssBaseline from "@mui/material/CssBaseline";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
@@ -46,38 +43,11 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import { useTheme as useAppTheme } from "@/context/ThemeContext";
 import { EventInput, EventClickArg } from "@fullcalendar/core";
-
-const lightTheme = createTheme({ palette: { mode: "light" } });
 
 export default function MuiCalendarPage() {
   const calendarRef = React.useRef<FullCalendar | null>(null);
   const [currentView, setCurrentView] = React.useState<"dayGridMonth" | "timeGridWeek" | "timeGridDay">("dayGridMonth");
-  const { theme } = useAppTheme();
-  const muiTheme = React.useMemo(() => {
-    // Pull brand color tokens from CSS variables to align with dashboard
-    if (typeof window !== "undefined") {
-      const root = getComputedStyle(document.documentElement);
-      const brand500 = root.getPropertyValue("--color-brand-500").trim() || "#465fff";
-      const brand600 = root.getPropertyValue("--color-brand-600").trim() || "#3641f5";
-      const brand300 = root.getPropertyValue("--color-brand-300").trim() || "#9cb9ff";
-      return createTheme({
-        palette: {
-          mode: theme,
-          primary: { main: brand500, dark: brand600, light: brand300 },
-        },
-        shape: { borderRadius: 12 },
-        components: {
-          MuiButton: { styleOverrides: { root: { textTransform: "none", borderRadius: 10 } } },
-          MuiChip: { styleOverrides: { root: { borderRadius: 10 } } },
-          MuiPaper: { styleOverrides: { root: { borderRadius: 16 } } },
-          MuiTextField: { defaultProps: { size: "small", variant: "outlined" } },
-        },
-      });
-    }
-    return createTheme({ palette: { mode: theme } });
-  }, [theme]);
   const [events, setEvents] = React.useState<EventInput[]>([]);
   const [loading, setLoading] = React.useState(false);
   const [toast, setToast] = React.useState<{ open: boolean; message: string; severity: "success" | "error" | "info" }>(
@@ -507,52 +477,65 @@ export default function MuiCalendarPage() {
   }, []);
 
   return (
-    <MuiThemeProvider theme={muiTheme ?? lightTheme}>
-      <CssBaseline />
-      <PageBreadcrumb pageTitle="MUI Calendar" />
+      <>
       <Paper elevation={0} className="rounded-2xl border border-gray-200 dark:border-gray-800 dark:bg-white/[0.03]" sx={{ p: 2 }}>
         {/* Toolbar approximating Google Calendar */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}>
-          <Typography variant="h6" sx={{ mr: 1, display: { xs: "none", sm: "block" } }}>
-            Calendar
-          </Typography>
           <Button color="primary" startIcon={<AddIcon />} variant="contained" size="small" onClick={openCreateMenu} sx={{ mr: 1 }}>
             Create
           </Button>
-          <IconButton aria-label="prev" onClick={handlePrev} size="small">
-            <ChevronLeftIcon />
-          </IconButton>
-          <IconButton aria-label="next" onClick={handleNext} size="small">
-            <ChevronRightIcon />
-          </IconButton>
-          <Button startIcon={<CalendarTodayIcon />} onClick={handleToday} variant="outlined" size="small">
-            Today
-          </Button>
-          <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
-          <Button
-            onClick={() => switchView("dayGridMonth")}
-            size="small"
-            variant={currentView === "dayGridMonth" ? "contained" : "text"}
-            startIcon={<ViewModuleIcon />}
-          >
-            Month
-          </Button>
-          <Button
-            onClick={() => switchView("timeGridWeek")}
-            size="small"
-            variant={currentView === "timeGridWeek" ? "contained" : "text"}
-            startIcon={<ViewWeekIcon />}
-          >
-            Week
-          </Button>
-          <Button
-            onClick={() => switchView("timeGridDay")}
-            size="small"
-            variant={currentView === "timeGridDay" ? "contained" : "text"}
-            startIcon={<ViewDayIcon />}
-          >
-            Day
-          </Button>
+          <div className="ml-auto flex items-center gap-1 flex-wrap">
+            <IconButton aria-label="prev" onClick={handlePrev} size="small">
+              <ChevronLeftIcon />
+            </IconButton>
+            <IconButton aria-label="next" onClick={handleNext} size="small">
+              <ChevronRightIcon />
+            </IconButton>
+            <Button startIcon={<CalendarTodayIcon />} onClick={handleToday} variant="outlined" size="small">
+              Today
+            </Button>
+            <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
+            <div className="rounded-lg bg-gray-100 p-0.5 dark:bg-gray-900">
+              <div className="flex">
+                <button
+                  type="button"
+                  onClick={() => switchView("dayGridMonth")}
+                  className={
+                    `h-auto w-auto rounded-md border-0 bg-transparent px-5 py-2 text-sm font-medium ` +
+                    (currentView === "dayGridMonth"
+                      ? `text-gray-900 bg-white dark:bg-gray-800 dark:text-white`
+                      : `text-gray-500 hover:text-gray-700 dark:text-gray-400`)
+                  }
+                >
+                  Month
+                </button>
+                <button
+                  type="button"
+                  onClick={() => switchView("timeGridWeek")}
+                  className={
+                    `h-auto w-auto rounded-md border-0 bg-transparent px-5 py-2 text-sm font-medium ` +
+                    (currentView === "timeGridWeek"
+                      ? `text-gray-900 bg-white dark:bg-gray-800 dark:text-white`
+                      : `text-gray-500 hover:text-gray-700 dark:text-gray-400`)
+                  }
+                >
+                  Week
+                </button>
+                <button
+                  type="button"
+                  onClick={() => switchView("timeGridDay")}
+                  className={
+                    `h-auto w-auto rounded-md border-0 bg-transparent px-5 py-2 text-sm font-medium ` +
+                    (currentView === "timeGridDay"
+                      ? `text-gray-900 bg-white dark:bg-gray-800 dark:text-white`
+                      : `text-gray-500 hover:text-gray-700 dark:text-gray-400`)
+                  }
+                >
+                  Day
+                </button>
+              </div>
+            </div>
+          </div>
         </Box>
         <Divider sx={{ my: 2 }} />
 
@@ -746,7 +729,7 @@ export default function MuiCalendarPage() {
           {toast.message}
         </Alert>
       </Snackbar>
-    </MuiThemeProvider>
+    </>
   );
 }
 
