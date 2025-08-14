@@ -20,31 +20,7 @@ export default function AdminLayout({
   const { theme } = useTheme();
   const muiTheme = React.useMemo(() => createMuiThemeFromCssVars(theme), [theme]);
 
-  // When any modal/overlay opens, blur header focus and make header inert (generic, not MUI-specific)
-  useEffect(() => {
-    const header = document.getElementById("app-header");
-    if (!header) return;
-    let prevAnyOpen = false;
-    const observer = new MutationObserver(() => {
-      const anyOpen = !!document.querySelector(
-        "[aria-modal='true'], .MuiDialog-root:not([aria-hidden='true']), .flatpickr-calendar.open, .fc-popover, [data-overlay='true']"
-      );
-      if (anyOpen === prevAnyOpen) return; // Only react on state transition
-      prevAnyOpen = anyOpen;
-      if (anyOpen) {
-        (document.activeElement as HTMLElement | null)?.blur?.();
-        // Do NOT set inert on the whole header to avoid blocking sidebar interactions/events.
-        // Instead, only disable pointer-events to prevent accidental clicks while modal is open.
-        header.style.pointerEvents = "none";
-        header.style.userSelect = "none";
-      } else {
-        header.style.pointerEvents = "";
-        header.style.userSelect = "";
-      }
-    });
-    observer.observe(document.body, { attributes: true, childList: true, subtree: true, attributeFilter: ["aria-hidden", "aria-modal", "class"] });
-    return () => observer.disconnect();
-  }, []);
+  // Focus-guard reverted: no DOM observers / header manipulation
 
   // Dynamic class for main content margin based on sidebar state
   const mainContentMargin = isMobileOpen
