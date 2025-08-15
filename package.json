@@ -4,13 +4,24 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "prisma generate"
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev --name init",
+    "prisma:push": "prisma db push",
+    "prisma:seed": "node -r ts-node/register prisma/seed.ts",
+    "db:init": "npm run prisma:migrate && npm run prisma:seed"
+  },
+  "prisma": {
+    "seed": "node -r ts-node/register prisma/seed.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "2.10.0",
+    "@dnd-kit/accessibility": "^3.1.1",
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@fullcalendar/core": "^6.1.15",
@@ -41,6 +52,8 @@
     "react-dom": "^19.0.0",
     "react-dropzone": "^14.3.5",
     "rrule": "^2.7.2",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1",
     "swiper": "^11.2.0",
     "tailwind-merge": "^2.6.0",
     "zod": "4.0.17"
@@ -56,7 +69,8 @@
     "eslint-config-next": "15.1.3",
     "postcss": "^8",
     "tailwindcss": "^4.0.0",
-    "typescript": "^5"
+    "typescript": "^5",
+    "ts-node": "^10.9.2"
   },
   "overrides": {
     "@react-jvectormap/core": {

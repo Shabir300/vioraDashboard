@@ -1,6 +1,99 @@
-import { createTheme, Theme } from "@mui/material/styles";
+import { createTheme, Theme, PaletteMode } from "@mui/material/styles";
+import { responsiveFontSizes } from "@mui/material/styles";
 
 type Mode = "light" | "dark";
+
+// TypeScript module augmentation for custom theme tokens
+declare module '@mui/material/styles' {
+  interface Palette {
+    semantic: {
+      success: string;
+      info: string;
+      warning: string;
+      danger: string;
+    };
+    stage: {
+      lead: string;
+      contacted: string;
+      negotiation: string;
+      closed: string;
+    };
+    brand: {
+      primary: string;
+      secondary: string;
+      neutral: string;
+    };
+  }
+  
+  interface PaletteOptions {
+    semantic?: {
+      success: string;
+      info: string;
+      warning: string;
+      danger: string;
+    };
+    stage?: {
+      lead: string;
+      contacted: string;
+      negotiation: string;
+      closed: string;
+    };
+    brand?: {
+      primary: string;
+      secondary: string;
+      neutral: string;
+    };
+  }
+
+  interface Theme {
+    vars: {
+      radius: {
+        sm: string;
+        md: string;
+        lg: string;
+        xl: string;
+      };
+      density: {
+        compact: number;
+        comfortable: number;
+        spacious: number;
+      };
+    };
+  }
+
+  interface ThemeOptions {
+    vars?: {
+      radius: {
+        sm: string;
+        md: string;
+        lg: string;
+        xl: string;
+      };
+      density: {
+        compact: number;
+        comfortable: number;
+        spacious: number;
+      };
+    };
+  }
+}
+
+
+
+
+
+declare module '@mui/material/Chip' {
+  interface ChipPropsVariantOverrides {
+    stageBadge: true;
+    priorityBadge: true;
+  }
+}
+
+declare module '@mui/material/Button' {
+  interface ButtonPropsVariantOverrides {
+    pipelineAction: true;
+  }
+}
 
 function readCssVar(name: string, fallback: string): string {
   if (typeof window === "undefined") return fallback;
@@ -9,7 +102,7 @@ function readCssVar(name: string, fallback: string): string {
   return trimmed || fallback;
 }
 
-export function createMuiThemeFromCssVars(mode: Mode): Theme {
+export function createMuiThemeFromCssVars(mode: PaletteMode): Theme {
   // Respect the app's active font set by Next.js layout (next/font)
   const readFontFamily = (): string => {
     if (typeof window === "undefined") return "inherit";
@@ -45,7 +138,24 @@ export function createMuiThemeFromCssVars(mode: Mode): Theme {
 
   const isLight = mode === "light";
 
-  return createTheme({
+  const stageColors = {
+    lead: "#3B82F6",
+    contacted: "#8B5CF6",
+    qualified: "#8B5CF6",
+    proposal: "#F59E0B",
+    negotiation: "#EF4444",
+    closed: "#10B981",
+    lost: "#6B7280",
+  };
+
+  const priorityColors = {
+    low: "#6B7280",
+    medium: "#F59E0B",
+    high: "#EF4444",
+    urgent: "#DC2626",
+  };
+
+  const baseTheme = createTheme({
     palette: {
       mode,
       primary: { main: brand500, dark: brand600, light: brand300 },
@@ -74,8 +184,23 @@ export function createMuiThemeFromCssVars(mode: Mode): Theme {
         default: isLight ? gray50 : gray900,
         paper: isLight ? "#ffffff" : grayDark,
       },
+      // Custom semantic palette
+      semantic: {
+        success: success500,
+        info: info500,
+        warning: warning500,
+        danger: error500,
+      },
+      // Pipeline stage colors
+      stage: stageColors,
+      // Brand colors
+      brand: {
+        primary: brand500,
+        secondary: info500,
+        neutral: gray500,
+      },
     },
-    shape: { borderRadius: 12 },
+    shape: { borderRadius: 4 },
     typography: {
       fontFamily: appFont,
       button: {
@@ -89,7 +214,6 @@ export function createMuiThemeFromCssVars(mode: Mode): Theme {
       MuiCssBaseline: {
         styleOverrides: {
           body: {
-            // Keep in sync with Tailwind body background
             backgroundColor: isLight ? gray50 : gray900,
           },
           '*, *::before, *::after': { boxSizing: 'border-box' },
@@ -159,57 +283,284 @@ export function createMuiThemeFromCssVars(mode: Mode): Theme {
               minHeight: 40,
             },
           },
+          // Medium size buttons
+          sizeMedium: {
+            '&&': {
+              paddingTop: 12,
+              paddingBottom: 12,
+              paddingLeft: 20,
+              paddingRight: 20,
+              fontSize: "1rem",
+              lineHeight: 1.5,
+              borderRadius: 12,
+              minHeight: 48,
+            },
+          },
+          containedSizeMedium: {
+            '&&': {
+              paddingTop: 12,
+              paddingBottom: 12,
+              paddingLeft: 20,
+              paddingRight: 20,
+              fontSize: "1rem",
+              lineHeight: 1.5,
+              borderRadius: 12,
+              minHeight: 48,
+            },
+          },
+          outlinedSizeMedium: {
+            '&&': {
+              paddingTop: 12,
+              paddingBottom: 12,
+              paddingLeft: 20,
+              paddingRight: 20,
+              fontSize: "1rem",
+              lineHeight: 1.5,
+              borderRadius: 12,
+              minHeight: 48,
+            },
+          },
+          textSizeMedium: {
+            '&&': {
+              paddingTop: 12,
+              paddingBottom: 12,
+              paddingLeft: 16,
+              paddingRight: 16,
+              fontSize: "1rem",
+              lineHeight: 1.5,
+              borderRadius: 12,
+              minHeight: 48,
+            },
+          },
+          // Large size buttons
+          sizeLarge: {
+            '&&': {
+              paddingTop: 16,
+              paddingBottom: 16,
+              paddingLeft: 24,
+              paddingRight: 24,
+              fontSize: "1.125rem",
+              lineHeight: 1.5,
+              borderRadius: 14,
+              minHeight: 56,
+            },
+          },
+          containedSizeLarge: {
+            '&&': {
+              paddingTop: 16,
+              paddingBottom: 16,
+              paddingLeft: 24,
+              paddingRight: 24,
+              fontSize: "1.125rem",
+              lineHeight: 1.5,
+              borderRadius: 14,
+              minHeight: 56,
+            },
+          },
+          outlinedSizeLarge: {
+            '&&': {
+              paddingTop: 16,
+              paddingBottom: 16,
+              paddingLeft: 24,
+              paddingRight: 24,
+              fontSize: "1.125rem",
+              lineHeight: 1.5,
+              borderRadius: 14,
+              minHeight: 56,
+            },
+          },
+          textSizeLarge: {
+            '&&': {
+              paddingTop: 16,
+              paddingBottom: 16,
+              paddingLeft: 20,
+              paddingRight: 20,
+              fontSize: "1.125rem",
+              lineHeight: 1.5,
+              borderRadius: 14,
+              minHeight: 56,
+            },
+          },
           containedPrimary: {
-            '&&': {
-              backgroundColor: brand500,
-              color: "#ffffff",
-              boxShadow: "var(--shadow-theme-xs)",
-              "&:hover": {
-                backgroundColor: brand600,
-                boxShadow: "var(--shadow-theme-xs)",
-              },
-              "&.Mui-disabled": {
-                backgroundColor: brand300,
-                color: "#ffffff",
-              },
+            backgroundColor: brand500,
+            color: "#ffffff",
+            '&:hover': {
+              backgroundColor: brand600,
             },
           },
-          outlinedPrimary: {
-            '&&': {
-              borderColor: gray300,
-              color: gray700,
-              backgroundColor: "transparent",
-              "&:hover": {
-                borderColor: gray300,
-                backgroundColor: isLight ? gray100 : "rgba(255,255,255,0.03)",
-              },
+          containedSecondary: {
+            backgroundColor: info500,
+            color: "#ffffff",
+            '&:hover': {
+              backgroundColor: info500,
             },
           },
-          textPrimary: {
-            '&&': {
-              color: brand500,
-              "&:hover": { backgroundColor: isLight ? gray100 : "rgba(255,255,255,0.03)" },
+          outlined: {
+            borderColor: isLight ? gray300 : gray600,
+            color: isLight ? gray700 : gray200,
+            '&:hover': {
+              backgroundColor: isLight ? gray100 : "rgba(255,255,255,0.03)",
+            },
+          },
+          text: {
+            color: isLight ? gray700 : gray200,
+            '&:hover': {
+              backgroundColor: isLight ? gray100 : "rgba(255,255,255,0.03)",
             },
           },
         },
       },
-      MuiChip: {
-        styleOverrides: { root: { borderRadius: 10 } },
+      MuiCard: {
+        defaultProps: {
+          elevation: 0,
+        },
+        styleOverrides: {
+          root: {
+            backgroundColor: isLight ? "#ffffff" : grayDark,
+            border: `1px solid ${isLight ? gray200 : gray700}`,
+            borderRadius: 0,
+            boxShadow: isLight 
+              ? "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)"
+              : "0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2)",
+            transition: 'all 0.2s ease-in-out',
+            '&:hover': {
+              boxShadow: isLight 
+                ? "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)"
+                : "0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2)",
+              transform: 'translateY(-2px)',
+            },
+          },
+        },
+        variants: [
+          {
+            props: { variant: 'pipelineCard' as any },
+            style: {
+              backgroundColor: isLight ? "#ffffff" : grayDark,
+              border: `2px solid ${isLight ? gray200 : gray700}`,
+              borderRadius: 0,
+              padding: 16,
+              cursor: 'pointer',
+              '&:hover': {
+                borderColor: brand500,
+                backgroundColor: isLight ? gray100 : gray800,
+              },
+            },
+          },
+        ],
       },
       MuiPaper: {
-        defaultProps: { elevation: 0 },
-        styleOverrides: { root: { borderRadius: 16 } },
+        defaultProps: {
+          elevation: 0,
+        },
+        styleOverrides: {
+          root: {
+            backgroundColor: isLight ? "#ffffff" : grayDark,
+            border: `1px solid ${isLight ? gray200 : gray700}`,
+            borderRadius: 0,
+          },
+        },
+        variants: [
+          {
+            props: { variant: 'stageColumn' as any },
+            style: {
+              backgroundColor: isLight ? "#ffffff" : grayDark,
+              border: `2px solid ${isLight ? gray200 : gray700}`,
+              borderRadius: 0,
+              padding: 20,
+              minHeight: 400,
+              minWidth: 300,
+            },
+          },
+        ],
       },
-      MuiTextField: {
-        defaultProps: { size: "small", variant: "outlined" },
+      MuiChip: {
+        styleOverrides: {
+          root: {
+            borderRadius: 16,
+            fontWeight: 500,
+            fontSize: '0.75rem',
+            height: 24,
+          },
+          colorPrimary: {
+            backgroundColor: brand500,
+            color: "#ffffff",
+          },
+          colorSecondary: {
+            backgroundColor: info500,
+            color: "#ffffff",
+          },
+          colorSuccess: {
+            backgroundColor: success500,
+            color: "#ffffff",
+          },
+          colorWarning: {
+            backgroundColor: warning500,
+            color: "#ffffff",
+          },
+          colorError: {
+            backgroundColor: error500,
+            color: "#ffffff",
+          },
+        },
       },
       MuiDialog: {
         styleOverrides: {
-          paper: { borderRadius: 16 },
+          paper: {
+            backgroundColor: isLight ? "#ffffff" : grayDark,
+            borderRadius: 16,
+            boxShadow: isLight 
+              ? "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
+              : "0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2)",
+          },
+        },
+      },
+      MuiAppBar: {
+        styleOverrides: {
+          root: {
+            backgroundColor: isLight ? "#ffffff" : grayDark,
+            borderBottom: `1px solid ${isLight ? gray200 : gray700}`,
+            boxShadow: isLight 
+              ? "0 1px 3px 0 rgba(0, 0, 0, 0.1)"
+              : "0 1px 3px 0 rgba(0, 0, 0, 0.3)",
+          },
+        },
+      },
+      MuiListItem: {
+        styleOverrides: {
+          root: {
+            borderRadius: 0,
+            marginBottom: 4,
+            '&:hover': {
+              backgroundColor: isLight ? gray100 : gray800,
+            },
+          },
         },
       },
     },
   });
+
+  return responsiveFontSizes(baseTheme);
 }
+
+// Export theme utilities
+export const getStageColor = (stage: string, theme: Theme): string => {
+  const stageColors = {
+    lead: theme.palette.stage.lead,
+    contacted: theme.palette.stage.contacted,
+    negotiation: theme.palette.stage.negotiation,
+    closed: theme.palette.stage.closed,
+  };
+  return stageColors[stage as keyof typeof stageColors] || theme.palette.grey[500];
+};
+
+export const getPriorityColor = (priority: string, theme: Theme): string => {
+  const priorityColors = {
+    low: theme.palette.grey[500],
+    medium: theme.palette.warning.main,
+    high: theme.palette.error.main,
+    urgent: '#DC2626',
+  };
+  return priorityColors[priority as keyof typeof priorityColors] || theme.palette.grey[500];
+};
 
 

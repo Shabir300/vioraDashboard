@@ -1,3 +1,79 @@
 {
-  "extends": "next/core-web-vitals"
+  "extends": "next/core-web-vitals",
+  "rules": {
+    "no-restricted-syntax": [
+      "error",
+      {
+        "selector": "Literal[value=/^#[0-9A-Fa-f]{6}$/]",
+        "message": "Hardcoded hex colors are not allowed. Use theme.palette tokens instead."
+      },
+      {
+        "selector": "Literal[value=/^#[0-9A-Fa-f]{3}$/]",
+        "message": "Hardcoded hex colors are not allowed. Use theme.palette tokens instead."
+      },
+      {
+        "selector": "Literal[value=/^rgba?\\(/]",
+        "message": "Hardcoded rgba colors are not allowed. Use theme.palette tokens instead."
+      },
+      {
+        "selector": "Literal[value=/^hsla?\\(/]",
+        "message": "Hardcoded hsl colors are not allowed. Use theme.palette tokens instead."
+      }
+    ],
+    "no-restricted-properties": [
+      "error",
+      {
+        "object": "sx",
+        "property": "color",
+        "message": "Direct color property in sx is not allowed. Use theme.palette tokens instead."
+      },
+      {
+        "object": "sx",
+        "property": "backgroundColor",
+        "message": "Direct backgroundColor property in sx is not allowed. Use theme.palette tokens instead."
+      },
+      {
+        "object": "sx",
+        "property": "borderColor",
+        "message": "Direct borderColor property in sx is not allowed. Use theme.palette tokens instead."
+      }
+    ],
+    "no-restricted-values": [
+      "error",
+      {
+        "values": [
+          "#000000",
+          "#ffffff",
+          "#000",
+          "#fff",
+          "black",
+          "white",
+          "red",
+          "green",
+          "blue",
+          "yellow",
+          "purple",
+          "orange",
+          "pink",
+          "gray",
+          "grey"
+        ],
+        "message": "Hardcoded color values are not allowed. Use theme.palette tokens instead."
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": ["**/*.ts", "**/*.tsx"],
+      "rules": {
+        "@typescript-eslint/no-restricted-syntax": [
+          "error",
+          {
+            "selector": "TemplateLiteral[quasis.0.raw.raw=/\\$\\{[^}]*\\.palette\\.[^}]*\\}/]",
+            "message": "Theme palette access must use proper typing. Use theme.palette.tokenName format."
+          }
+        ]
+      }
+    }
+  ]
 }

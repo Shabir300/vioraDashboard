@@ -47,6 +47,11 @@ const navItems: NavItem[] = [
     name: "User Profile",
     path: "/profile",
   },
+  {
+    icon: <GridIcon />,
+    name: "Pipeline",
+    path: "/pipeline",
+  },
 
   {
     name: "Forms",
