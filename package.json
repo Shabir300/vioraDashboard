@@ -4,14 +4,15 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
     "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev --name init",
+    "prisma:migrate": "prisma migrate deploy",
     "prisma:push": "prisma db push",
     "prisma:seed": "node -r ts-node/register prisma/seed.ts",
-    "db:init": "npm run prisma:migrate && npm run prisma:seed"
+    "db:init": "npm run prisma:migrate && npm run prisma:seed",
+    "postinstall": "prisma generate"
   },
   "prisma": {
     "seed": "node -r ts-node/register prisma/seed.ts"
