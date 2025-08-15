@@ -26,30 +26,7 @@ import { useTheme } from '@mui/material/styles';
 import { getPriorityColor } from '@/lib/muiTheme';
 import Link from 'next/link';
 import { useDraggable, useDroppable } from '@dnd-kit/core';
-
-interface Client {
-  id: string;
-  name: string;
-  email: string;
-  company: string;
-  valueUsd: number;
-}
-
-interface CardData {
-  id: string;
-  title: string;
-  description?: string;
-  value?: number;
-  priority: 'low' | 'medium' | 'high' | 'urgent';
-  dueDate?: string;
-  client?: Client; // Made optional since client details can be stored directly in card
-  position: number;
-  // Client details stored directly in the card (for deals not yet closed)
-  clientName?: string;
-  clientEmail?: string;
-  clientCompany?: string;
-  clientPhone?: string;
-}
+import type { Client, Card as CardData } from '@/hooks/usePipelineData';
 
 interface PipelineCardProps {
   card: CardData;

@@ -3,8 +3,8 @@ import prisma from "@/lib/prisma";
 import { jsonError, jsonOk, requireAuthWithOrg } from "@/lib/api-helpers";
 import { emitPipelineEvent } from "@/lib/realtime";
 
-export async function DELETE(req: NextRequest, { params }: { params: { pipelineId: string; cardId: string } }) {
-  const { cardId } = params;
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ pipelineId: string; cardId: string }> }) {
+  const { cardId } = await params;
   const auth = await requireAuthWithOrg(req);
   if ("error" in auth) return auth.error;
   const { organizationId } = auth;

@@ -3,8 +3,8 @@ import prisma from "@/lib/prisma";
 import { jsonError, jsonOk, requireAuthWithOrg } from "@/lib/api-helpers";
 import { emitPipelineEvent } from "@/lib/realtime";
 
-export async function POST(req: NextRequest, { params }: { params: { pipelineId: string } }) {
-  const { pipelineId } = params;
+export async function POST(req: NextRequest, { params }: { params: Promise<{ pipelineId: string }> }) {
+  const { pipelineId } = await params;
   const auth = await requireAuthWithOrg(req);
   if ("error" in auth) return auth.error;
   const { organizationId } = auth;
@@ -22,15 +22,24 @@ export async function POST(req: NextRequest, { params }: { params: { pipelineId:
     });
     usedClientId = createdClient.id;
   }
+
+  // Get the highest position in the stage if not provided
+  const maxPosition = await prisma.pipelineCard.findFirst({
+    where: { stageId },
+    orderBy: { position: 'desc' },
+    select: { position: true },
+  });
+  const position = maxPosition ? maxPosition.position + 1 : 0;
+
   const card = await prisma.pipelineCard.create({
-    data: { organizationId, pipelineId, stageId, clientId: usedClientId, title, value, metadata },
+    data: { organizationId, pipelineId, stageId, clientId: usedClientId, title, value, metadata, position },
   });
   emitPipelineEvent({ type: "card:update", organizationId, payload: { card } });
   return jsonOk({ card }, 201);
 }
 
-export async function PATCH(req: NextRequest, { params }: { params: { pipelineId: string } }) {
-  const { pipelineId } = params;
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ pipelineId: string }> }) {
+  const { pipelineId } = await params;
   const auth = await requireAuthWithOrg(req);
   if ("error" in auth) return auth.error;
   const { organizationId } = auth;

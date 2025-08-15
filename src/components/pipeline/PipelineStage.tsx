@@ -22,39 +22,7 @@ import { useTheme } from '@mui/material/styles';
 import { getStageColor } from '@/lib/muiTheme';
 import PipelineCard from './PipelineCard';
 import { useDroppable } from '@dnd-kit/core';
-
-interface Client {
-  id: string;
-  name: string;
-  email: string;
-  company: string;
-  valueUsd: number;
-}
-
-interface Card {
-  id: string;
-  title: string;
-  description?: string;
-  value?: number;
-  priority: 'low' | 'medium' | 'high' | 'urgent';
-  dueDate?: string;
-  client?: Client; // Made optional since client details can be stored directly in card
-  position: number;
-  // Client details stored directly in the card (for deals not yet closed)
-  clientName?: string;
-  clientEmail?: string;
-  clientCompany?: string;
-  clientPhone?: string;
-}
-
-interface Stage {
-  id: string;
-  name: string;
-  description?: string;
-  color: string;
-  position: number;
-  cards: Card[];
-}
+import type { Client, Card, Stage } from '@/hooks/usePipelineData';
 
 interface PipelineStageProps {
   stage: Stage;

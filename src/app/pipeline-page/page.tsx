@@ -7,7 +7,6 @@ import {
   Button,
   Container,
   Paper,
-  Grid,
   Chip,
   IconButton,
   Dialog,
@@ -49,6 +48,7 @@ const mockStages = [
         value: 50000,
         priority: 'high',
         dueDate: '2024-02-15',
+        stageId: '1',
         client: {
           id: '1',
           name: 'John Smith',
@@ -65,6 +65,7 @@ const mockStages = [
         value: 25000,
         priority: 'medium',
         dueDate: '2024-02-20',
+        stageId: '1',
         client: {
           id: '2',
           name: 'Sarah Johnson',
@@ -90,6 +91,7 @@ const mockStages = [
         value: 150000,
         priority: 'urgent',
         dueDate: '2024-02-10',
+        stageId: '2',
         client: {
           id: '3',
           name: 'Mike Davis',
@@ -115,6 +117,7 @@ const mockStages = [
         value: 75000,
         priority: 'high',
         dueDate: '2024-02-05',
+        stageId: '3',
         client: {
           id: '4',
           name: 'Lisa Chen',
@@ -140,6 +143,7 @@ const mockStages = [
         value: 100000,
         priority: 'low',
         dueDate: '2024-01-30',
+        stageId: '4',
         client: {
           id: '5',
           name: 'Robert Wilson',
@@ -155,6 +159,8 @@ const mockStages = [
 
 export default function PipelinePage() {
   const theme = useTheme();
+  // Use seeded org for now. Replace with actual org from session once auth is wired.
+  const organizationId = 'org_seed_1';
   const [stages, setStages] = useState(mockStages);
   const [createCardOpen, setCreateCardOpen] = useState(false);
   const [createStageOpen, setCreateStageOpen] = useState(false);
@@ -199,6 +205,30 @@ export default function PipelinePage() {
         c.position = i;
       });
       
+      return newStages;
+    });
+  };
+
+  const handleEditStage = (stage: any) => {
+    // TODO: Implement stage editing
+    console.log('Edit stage:', stage);
+  };
+
+  const handleDeleteStage = (stageId: string) => {
+    setStages(prevStages => prevStages.filter(stage => stage.id !== stageId));
+  };
+
+  const handleEditCard = (card: any) => {
+    // TODO: Implement card editing
+    console.log('Edit card:', card);
+  };
+
+  const handleDeleteCard = (cardId: string) => {
+    setStages(prevStages => {
+      const newStages = [...prevStages];
+      newStages.forEach(stage => {
+        stage.cards = stage.cards.filter(card => card.id !== cardId);
+      });
       return newStages;
     });
   };
@@ -275,17 +305,29 @@ export default function PipelinePage() {
 
       {/* Kanban Board */}
       <Box sx={{ overflowX: 'auto' }}>
-        <Grid container spacing={3} sx={{ minWidth: 'max-content', pb: 2 }}>
+        <Box 
+          sx={{ 
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' },
+            gap: 3,
+            minWidth: 'max-content', 
+            pb: 2 
+          }}
+        >
           {stages.map((stage) => (
-            <Grid item key={stage.id} xs={12} sm={6} md={3}>
+            <Box key={stage.id}>
               <PipelineStage
                 stage={stage}
                 onAddCard={() => handleCreateCard(stage.id)}
                 onCardMove={handleCardMove}
+                onEditStage={handleEditStage}
+                onDeleteStage={handleDeleteStage}
+                onEditCard={handleEditCard}
+                onDeleteCard={handleDeleteCard}
               />
-            </Grid>
+            </Box>
           ))}
-        </Grid>
+        </Box>
       </Box>
 
       {/* Dialogs */}
@@ -298,6 +340,7 @@ export default function PipelinePage() {
           // Handle card creation
           setCreateCardOpen(false);
         }}
+        organizationId={organizationId}
       />
       
       <CreateStageDialog

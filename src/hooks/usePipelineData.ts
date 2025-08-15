@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 
-interface Client {
+export interface Client {
   id: string;
   name: string;
   email: string;
@@ -8,12 +8,12 @@ interface Client {
   valueUsd: number;
 }
 
-interface Card {
+export interface Card {
   id: string;
   title: string;
   description?: string;
   value?: number;
-  priority: 'low' | 'medium' | 'high' | 'urgent';
+  priority: string; // Changed from union type to string to match database schema
   dueDate?: string;
   client?: Client; // Made optional since client details can be stored directly in card
   position: number;
@@ -25,7 +25,7 @@ interface Card {
   clientPhone?: string;
 }
 
-interface Stage {
+export interface Stage {
   id: string;
   name: string;
   description?: string;
@@ -34,7 +34,7 @@ interface Stage {
   cards: Card[];
 }
 
-interface Pipeline {
+export interface Pipeline {
   id: string;
   name: string;
   description?: string;

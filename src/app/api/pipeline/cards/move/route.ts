@@ -91,6 +91,9 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'Validation failed', details: error.issues }, { status: 400 });
     }
     console.error('Error moving card:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    
+    // Handle different error types safely
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

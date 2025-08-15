@@ -40,7 +40,7 @@ interface Card {
   title: string;
   description?: string;
   value?: number;
-  priority: 'low' | 'medium' | 'high' | 'urgent';
+  priority: string; // Changed from union type to string to match database schema
   dueDate?: string;
   client?: Client; // Made optional since client details can be stored directly in card
   position: number;

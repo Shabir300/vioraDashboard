@@ -12,13 +12,14 @@ const updateClientSchema = z.object({
 // GET /api/clients/[id] - Get a specific client
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const client = await prisma.client.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
-        cards: {
+        pipelineCards: {
           include: {
             stage: {
               select: {
@@ -52,9 +53,10 @@ export async function GET(
 // PUT /api/clients/[id] - Update a client
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await request.json();
     const validatedData = updateClientSchema.parse(body);
 
@@ -62,7 +64,7 @@ export async function PUT(
     const existingClient = await prisma.client.findFirst({
       where: {
         email: validatedData.email,
-        id: { not: params.id },
+        id: { not: id },
         organizationId: {
           // We need to get the organizationId from the existing client
           // This is a bit complex, so we'll do it in two steps
@@ -78,7 +80,7 @@ export async function PUT(
     }
 
     const updatedClient = await prisma.client.update({
-      where: { id: params.id },
+      where: { id },
       data: validatedData,
     });
 
@@ -102,12 +104,13 @@ export async function PUT(
 // DELETE /api/clients/[id] - Delete a client
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     // Delete the client (this will cascade delete associated cards)
     await prisma.client.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ message: 'Client deleted successfully' });

@@ -4,8 +4,8 @@ import { jsonError, jsonOk, requireAuthWithOrg, requireRole } from "@/lib/api-he
 import { OrgRole } from "@prisma/client";
 import { emitPipelineEvent } from "@/lib/realtime";
 
-export async function POST(req: NextRequest, { params }: { params: { pipelineId: string } }) {
-  const { pipelineId } = params;
+export async function POST(req: NextRequest, { params }: { params: Promise<{ pipelineId: string }> }) {
+  const { pipelineId } = await params;
   const auth = await requireAuthWithOrg(req);
   if ("error" in auth) return auth.error;
   const { session, organizationId } = auth;
@@ -23,8 +23,8 @@ export async function POST(req: NextRequest, { params }: { params: { pipelineId:
   return jsonOk({ stage: created }, 201);
 }
 
-export async function PATCH(req: NextRequest, { params }: { params: { pipelineId: string } }) {
-  const { pipelineId } = params;
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ pipelineId: string }> }) {
+  const { pipelineId } = await params;
   const auth = await requireAuthWithOrg(req);
   if ("error" in auth) return auth.error;
   const { session, organizationId } = auth;

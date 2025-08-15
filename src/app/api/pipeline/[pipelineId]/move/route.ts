@@ -4,8 +4,8 @@ import { jsonError, jsonOk, requireAuthWithOrg } from "@/lib/api-helpers";
 import { emitPipelineEvent } from "@/lib/realtime";
 
 // Move a card to another stage (and optionally reorder)
-export async function POST(req: NextRequest, { params }: { params: { pipelineId: string } }) {
-  const { pipelineId } = params;
+export async function POST(req: NextRequest, { params }: { params: Promise<{ pipelineId: string }> }) {
+  const { pipelineId } = await params;
   const auth = await requireAuthWithOrg(req);
   if ("error" in auth) return auth.error;
   const { organizationId } = auth;
@@ -81,9 +81,9 @@ export async function POST(req: NextRequest, { params }: { params: { pipelineId:
     // If we created a new client, emit an event for that too
     if (newClient) {
       emitPipelineEvent({ 
-        type: "client:create", 
+        type: "card:update", 
         organizationId, 
-        payload: { action: 'create', client: newClient } 
+        payload: { action: 'update', card: updatedCard, clientCreated: newClient } 
       });
     }
 

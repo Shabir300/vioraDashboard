@@ -34,40 +34,7 @@ import EditStageDialog from '@/components/pipeline/EditStageDialog';
 import EditCardDialog from '@/components/pipeline/EditCardDialog';
 import { usePipelineData } from '@/hooks/usePipelineData';
 import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
-
-interface Client {
-  id: string;
-  name: string;
-  email: string;
-  company: string;
-  valueUsd: number;
-}
-
-interface Card {
-  id: string;
-  title: string;
-  description?: string;
-  value?: number;
-  priority: 'low' | 'medium' | 'high' | 'urgent';
-  dueDate?: string;
-  client?: Client; // Made optional since client details can be stored directly in card
-  position: number;
-  stageId: string;
-  // Client details stored directly in the card (for deals not yet closed)
-  clientName?: string;
-  clientEmail?: string;
-  clientCompany?: string;
-  clientPhone?: string;
-}
-
-interface Stage {
-  id: string;
-  name: string;
-  description?: string;
-  color: string;
-  position: number;
-  cards: Card[];
-}
+import type { Client, Card, Stage } from '@/hooks/usePipelineData';
 
 export default function PipelinePage() {
   const theme = useTheme();

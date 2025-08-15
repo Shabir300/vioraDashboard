@@ -4,8 +4,8 @@ import { jsonError, jsonOk, requireAuthWithOrg, requireRole } from "@/lib/api-he
 import { OrgRole } from "@prisma/client";
 import { emitPipelineEvent } from "@/lib/realtime";
 
-export async function DELETE(req: NextRequest, { params }: { params: { pipelineId: string; stageId: string } }) {
-  const { stageId } = params;
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ pipelineId: string; stageId: string }> }) {
+  const { stageId } = await params;
   const auth = await requireAuthWithOrg(req);
   if ("error" in auth) return auth.error;
   const { session, organizationId } = auth;
