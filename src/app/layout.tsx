@@ -4,6 +4,7 @@ import './globals.css';
 import { SidebarProvider } from '@/context/SidebarContext';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { AuthProvider } from '@/context/AuthContext';
+import QueryProvider from '@/providers/QueryProvider';
 
 const ibmPlexSans = IBM_Plex_Sans({
   subsets: ["latin"],
@@ -53,9 +54,11 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${ibmPlexSans.className} dark:bg-gray-900`}>
         <AuthProvider>
-          <ThemeProvider>
-            <SidebarProvider>{children}</SidebarProvider>
-          </ThemeProvider>
+          <QueryProvider>
+            <ThemeProvider>
+              <SidebarProvider>{children}</SidebarProvider>
+            </ThemeProvider>
+          </QueryProvider>
         </AuthProvider>
       </body>
     </html>

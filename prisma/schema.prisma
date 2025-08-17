@@ -68,7 +68,7 @@ model User {
   sessions        Session[]
   memberships     OrganizationMembership[]
   assignedClients Client[]                 @relation("ClientAssignedUsers")
-  mindmaps        MindMap[]
+  mindmapBoards   MindMapBoard[]          @relation("UserCreatedBoards")
   affiliateLinks  AffiliateLink[]
   calendarEvents  CalendarEvent[]          @relation("UserCreatedEvents")
 }
@@ -84,7 +84,7 @@ model Organization {
   clients        Client[]
   pipelines      Pipeline[]
   invoices       Invoice[]
-  mindmaps       MindMap[]
+  mindmapBoards  MindMapBoard[]          @relation("OrganizationBoards")
   affiliateLinks AffiliateLink[]
   pipelineCards  PipelineCard[]
   transactions   Transaction[]
@@ -352,16 +352,7 @@ model Campaign {
   client Client @relation(fields: [clientId], references: [id])
 }
 
-model MindMap {
-  id             String   @id @default(cuid())
-  organizationId String?
-  ownerUserId    String?
-  data           Json
-  createdAt      DateTime @default(now())
 
-  organization Organization? @relation(fields: [organizationId], references: [id])
-  ownerUser    User?         @relation(fields: [ownerUserId], references: [id])
-}
 
 model AffiliateLink {
   id             String   @id @default(cuid())
@@ -422,4 +413,66 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+enum NodeType {
+  TEXT
+  RECTANGLE
+  ELLIPSE
+  DIAMOND
+  STICKY_NOTE
+}
+
+model MindMapBoard {
+  id             String   @id @default(cuid())
+  name           String
+  organizationId String
+  createdById    String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation("OrganizationBoards", fields: [organizationId], references: [id], onDelete: Cascade)
+  createdBy    User        @relation("UserCreatedBoards", fields: [createdById], references: [id])
+  nodes        MindMapNode[]
+  edges        MindMapEdge[]
+
+  @@unique([id, createdById])
+  @@index([createdById])
+  @@index([organizationId])
+}
+
+model MindMapNode {
+  id         String    @id @default(cuid())
+  boardId    String
+  label      String
+  type       NodeType  @default(TEXT)
+  positionX  Float
+  positionY  Float
+  width      Float?
+  height     Float?
+  parentId   String?
+  style      Json?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  board      MindMapBoard  @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  parent     MindMapNode?  @relation("NodeHierarchy", fields: [parentId], references: [id])
+  children   MindMapNode[] @relation("NodeHierarchy")
+  sourceEdges MindMapEdge[] @relation("SourceNode")
+  targetEdges MindMapEdge[] @relation("TargetNode")
+}
+
+model MindMapEdge {
+  id           String   @id @default(cuid())
+  boardId      String
+  sourceNodeId String
+  targetNodeId String
+  label        String?
+  style        Json?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  board       MindMapBoard @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  sourceNode  MindMapNode  @relation("SourceNode", fields: [sourceNodeId], references: [id], onDelete: Cascade)
+  targetNode  MindMapNode  @relation("TargetNode", fields: [targetNodeId], references: [id], onDelete: Cascade)
 }
