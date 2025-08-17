@@ -292,23 +292,103 @@ export async function DELETE(request: NextRequest) {
     const id = searchParams.get('id');
 
     if (!id) {
+      console.error('DELETE /api/pipeline/cards - Missing card ID:', { url: request.url });
       return NextResponse.json(
         { error: 'Card ID is required' },
         { status: 400 }
       );
     }
 
-    const deleted = await prisma.pipelineCard.delete({
+    if (typeof id !== 'string' || !id.trim()) {
+      console.error('DELETE /api/pipeline/cards - Invalid card ID:', { id, url: request.url });
+      return NextResponse.json(
+        { error: 'Card ID must be a valid string' },
+        { status: 400 }
+      );
+    }
+
+    // Check if card exists before attempting to delete
+    const existingCard = await prisma.pipelineCard.findUnique({
       where: { id },
+      select: { id: true, title: true, organizationId: true }
     });
 
-    emitPipelineEvent({ type: 'card:delete', organizationId: deleted.organizationId, payload: { id } });
+    if (!existingCard) {
+      console.error('DELETE /api/pipeline/cards - Card not found:', { id });
+      return NextResponse.json(
+        { error: 'Card not found' },
+        { status: 404 }
+      );
+    }
 
-    return NextResponse.json({ message: 'Card deleted successfully' });
-  } catch (error) {
-    console.error('Error deleting card:', error);
+    const deleted = await prisma.pipelineCard.delete({
+      where: { id },
+      select: { id: true, organizationId: true },
+    });
+
+    // Emit realtime event
+    try {
+      emitPipelineEvent({ 
+        type: 'card:delete', 
+        organizationId: deleted.organizationId, 
+        payload: { id: deleted.id } 
+      });
+    } catch (eventError) {
+      // Log the event error but don't fail the request
+      console.error('DELETE /api/pipeline/cards - Failed to emit pipeline event:', {
+        error: eventError,
+        cardId: deleted.id,
+        organizationId: deleted.organizationId
+      });
+    }
+
+    console.log('DELETE /api/pipeline/cards - Card deleted successfully:', { 
+      cardId: deleted.id,
+      cardTitle: existingCard.title,
+      organizationId: deleted.organizationId
+    });
+
+    return NextResponse.json({ 
+      message: 'Card deleted successfully', 
+      id: deleted.id 
+    });
+  } catch (error: any) {
+    console.error('DELETE /api/pipeline/cards - Unexpected error:', {
+      error: {
+        message: error?.message,
+        code: error?.code,
+        name: error?.name,
+        stack: error?.stack
+      },
+      url: request.url,
+      searchParams: Object.fromEntries(new URL(request.url).searchParams)
+    });
+
+    // Handle specific Prisma errors
+    if (error?.code === 'P2025') {
+      return NextResponse.json(
+        { error: 'Card not found or already deleted' },
+        { status: 404 }
+      );
+    }
+    
+    if (error?.code === 'P2003') {
+      return NextResponse.json(
+        { error: 'Cannot delete card due to existing dependencies' },
+        { status: 409 }
+      );
+    }
+
+    // Handle database connection errors
+    if (error?.code === 'P1001' || error?.code === 'P1002') {
+      return NextResponse.json(
+        { error: 'Database connection error. Please try again later.' },
+        { status: 503 }
+      );
+    }
+
     return NextResponse.json(
-      { error: 'Failed to delete card' },
+      { error: 'An unexpected error occurred while deleting the card' },
       { status: 500 }
     );
   }

@@ -2,12 +2,24 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import prisma from '@/lib/prisma';
 import { emitPipelineEvent } from '@/lib/realtime';
+import { requireAuthWithOrg } from '@/lib/api-helpers';
 
 // Validation schemas
+const createStageInputSchema = z.object({
+  name: z.string().min(1, 'Stage name is required'),
+  description: z.string().optional(),
+  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Color must be a valid hex color').default('#6B7280'),
+  position: z.number().int().min(0).optional(), // Will be auto-calculated if not provided
+  isDefault: z.boolean().default(false),
+});
+
 const createPipelineSchema = z.object({
   name: z.string().min(1, 'Pipeline name is required'),
   description: z.string().optional(),
+  status: z.enum(['Active', 'Inactive']).default('Active'),
+  isDefault: z.boolean().default(false),
   organizationId: z.string().min(1, 'Organization ID is required'),
+  stages: z.array(createStageInputSchema).min(1, 'At least one stage is required').max(20, 'Maximum 20 stages allowed'),
 });
 
 const createStageSchema = z.object({
@@ -39,18 +51,18 @@ const moveCardSchema = z.object({
 // GET /api/pipeline - Get all pipelines for an organization
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const organizationId = searchParams.get('organizationId');
-
-    if (!organizationId) {
-      return NextResponse.json(
-        { error: 'Organization ID is required' },
-        { status: 400 }
-      );
+    const authResult = await requireAuthWithOrg(request);
+    if ('error' in authResult) {
+      return authResult.error;
     }
+    const { organizationId } = authResult;
+
+    // Allow override for development/testing
+    const paramOrgId = new URL(request.url).searchParams.get('organizationId');
+    const finalOrgId = paramOrgId || organizationId;
 
     const pipelines = await prisma.pipeline.findMany({
-      where: { organizationId },
+      where: { organizationId: finalOrgId },
       include: {
         stages: {
           orderBy: { position: 'asc' },
@@ -84,33 +96,156 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST /api/pipeline - Create a new pipeline
+// POST /api/pipeline - Create a new pipeline with nested stages in a single transaction
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const validatedData = createPipelineSchema.parse(body);
+    const authResult = await requireAuthWithOrg(request);
+    if ('error' in authResult) {
+      return authResult.error;
+    }
+    const { organizationId } = authResult;
 
-    const pipeline = await prisma.pipeline.create({
-      data: validatedData,
-      include: {
-        stages: true,
-      },
+    const body = await request.json();
+    console.log('Creating pipeline with body:', JSON.stringify(body, null, 2));
+    
+    // Ensure organizationId comes from auth, not request body
+    const validatedData = createPipelineSchema.parse({
+      ...body,
+      organizationId,
     });
 
-    emitPipelineEvent({ type: 'pipeline:update', organizationId: pipeline.organizationId, payload: { action: 'create', pipeline } });
+    console.log('Validated data:', JSON.stringify(validatedData, null, 2));
 
+    // Use Prisma transaction to create pipeline with nested stages atomically
+    const pipeline = await prisma.$transaction(async (tx) => {
+      // Create the pipeline first
+      const createdPipeline = await tx.pipeline.create({
+        data: {
+          name: validatedData.name,
+          description: validatedData.description,
+          status: validatedData.status,
+          isDefault: validatedData.isDefault,
+          organizationId: validatedData.organizationId,
+        },
+      });
+
+      console.log('Created pipeline:', createdPipeline.id);
+
+      // Prepare stages with calculated positions
+      // Note: pipelineId is automatically handled by Prisma nested create
+      const stagesWithPositions = validatedData.stages.map((stage, index) => ({
+        name: stage.name,
+        description: stage.description,
+        color: stage.color,
+        position: stage.position ?? (index + 1) * 1000, // Auto-calculate position if not provided
+        isDefault: stage.isDefault,
+        // pipelineId is NOT needed here - Prisma handles the relationship automatically
+      }));
+
+      console.log('Creating stages:', stagesWithPositions.length);
+
+      // Create all stages using nested write (Prisma's recommended approach)
+      const pipelineWithStages = await tx.pipeline.update({
+        where: { id: createdPipeline.id },
+        data: {
+          stages: {
+            create: stagesWithPositions,
+          },
+        },
+        include: {
+          stages: {
+            orderBy: { position: 'asc' },
+            include: {
+              cards: {
+                orderBy: { position: 'asc' },
+                include: {
+                  client: {
+                    select: {
+                      id: true,
+                      name: true,
+                      email: true,
+                      company: true,
+                      valueUsd: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      });
+
+      console.log('Pipeline created with stages:', pipelineWithStages.stages.length);
+      return pipelineWithStages;
+    });
+
+    // Emit real-time event after successful creation
+    try {
+      emitPipelineEvent({ 
+        type: 'pipeline:create', 
+        organizationId: pipeline.organizationId, 
+        payload: { pipeline } 
+      });
+    } catch (eventError) {
+      // Log event error but don't fail the request
+      console.error('Failed to emit pipeline creation event:', eventError);
+    }
+
+    console.log('Pipeline creation completed successfully');
     return NextResponse.json(pipeline, { status: 201 });
-  } catch (error) {
+    
+  } catch (error: any) {
+    console.error('Error creating pipeline:', {
+      error: {
+        message: error?.message,
+        code: error?.code,
+        name: error?.name,
+        stack: error?.stack?.split('\n').slice(0, 5).join('\n'), // Truncate stack trace
+      },
+      url: request.url,
+    });
+
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Validation failed', details: error.issues },
+        { 
+          error: 'Validation failed', 
+          details: error.issues.map(issue => ({
+            field: issue.path.join('.'),
+            message: issue.message,
+            received: issue.received,
+          })),
+        },
         { status: 400 }
       );
     }
 
-    console.error('Error creating pipeline:', error);
+    // Handle specific Prisma errors
+    if (error?.code === 'P2002') {
+      const constraintField = error?.meta?.target?.[0] || 'field';
+      return NextResponse.json(
+        { error: `A pipeline with this ${constraintField} already exists in your organization` },
+        { status: 409 }
+      );
+    }
+
+    if (error?.code === 'P2025') {
+      return NextResponse.json(
+        { error: 'Organization not found' },
+        { status: 404 }
+      );
+    }
+
+    // Handle database connection errors
+    if (error?.code === 'P1001' || error?.code === 'P1002') {
+      return NextResponse.json(
+        { error: 'Database connection error. Please try again later.' },
+        { status: 503 }
+      );
+    }
+
+    // Generic server error
     return NextResponse.json(
-      { error: 'Failed to create pipeline' },
+      { error: 'An unexpected error occurred while creating the pipeline' },
       { status: 500 }
     );
   }

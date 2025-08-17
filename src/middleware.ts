@@ -11,7 +11,7 @@ export default withAuth(
       const orgId = req.nextauth?.token?.organizationId as string | undefined;
       if (!orgId) {
         // If no org linked, send them to setup flow (avoid redirect loop with /signin)
-        return NextResponse.redirect(new URL("/setup-org", req.url));
+        return NextResponse.redirect(new URL("/signin", req.url));
       }
     }
     return NextResponse.next();

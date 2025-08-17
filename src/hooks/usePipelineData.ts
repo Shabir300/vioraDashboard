@@ -31,14 +31,33 @@ export interface Stage {
   description?: string;
   color: string;
   position: number;
+  isDefault?: boolean;
   cards: Card[];
+}
+
+export interface StageInput {
+  name: string;
+  description?: string;
+  color?: string;
+  position?: number;
+  isDefault?: boolean;
 }
 
 export interface Pipeline {
   id: string;
   name: string;
   description?: string;
+  status?: 'Active' | 'Inactive';
+  isDefault?: boolean;
   stages: Stage[];
+}
+
+export interface PipelineInput {
+  name: string;
+  description?: string;
+  status?: 'Active' | 'Inactive';
+  isDefault?: boolean;
+  stages: StageInput[];
 }
 
 export function usePipelineData(organizationId: string) {
@@ -66,7 +85,41 @@ export function usePipelineData(organizationId: string) {
     }
   }, [organizationId]);
 
-  // Create pipeline
+  // Create pipeline with nested stages in a single transaction
+  const createPipelineWithStages = useCallback(async (pipelineData: PipelineInput) => {
+    try {
+      console.log('Creating pipeline with stages:', pipelineData);
+      
+      const response = await fetch('/api/pipeline', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...pipelineData,
+          organizationId,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const newPipeline = await response.json();
+      console.log('Pipeline created successfully:', newPipeline);
+      
+      setPipelines(prev => [...prev, newPipeline]);
+      return newPipeline;
+    } catch (err) {
+      console.error('Error in createPipelineWithStages:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to create pipeline';
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    }
+  }, [organizationId]);
+
+  // Create pipeline (legacy method - kept for backward compatibility)
   const createPipeline = useCallback(async (pipelineData: Partial<Pipeline>) => {
     try {
       const response = await fetch('/api/pipeline', {
@@ -139,6 +192,7 @@ export function usePipelineData(organizationId: string) {
       throw err;
     }
   }, []);
+
 
   // Create stage
   const createStage = useCallback(async (pipelineId: string, stageData: Partial<Stage>) => {
@@ -378,6 +432,7 @@ export function usePipelineData(organizationId: string) {
     error,
     fetchPipelines,
     createPipeline,
+    createPipelineWithStages,
     updatePipeline,
     deletePipeline,
     createStage,

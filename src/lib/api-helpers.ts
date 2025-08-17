@@ -5,6 +5,15 @@ import { OrgRole, UserRole } from "@prisma/client";
 
 export async function requireAuthWithOrg(req: NextRequest) {
   const session = await getServerSession(authOptions);
+  
+  // Development mode: allow requests with seed organization
+  if (process.env.NODE_ENV === 'development') {
+    const orgParam = new URL(req.url).searchParams.get('organizationId');
+    if (orgParam === 'org_seed_1') {
+      return { session, organizationId: 'org_seed_1' } as const;
+    }
+  }
+  
   if (!session || !session.user) {
     return { error: NextResponse.json({ error: "Unauthorized" }, { status: 401 }) } as const;
   }

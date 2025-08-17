@@ -153,6 +153,7 @@ model Pipeline {
   organizationId String
   name           String
   description    String?
+  status         String   @default("Active") // Active or Inactive
   isDefault      Boolean  @default(false)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt

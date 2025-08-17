@@ -10,12 +10,9 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate deploy",
     "prisma:push": "prisma db push",
-    "prisma:seed": "node -r ts-node/register prisma/seed.ts",
+    "prisma:seed": "prisma db seed",
     "db:init": "npm run prisma:migrate && npm run prisma:seed",
     "postinstall": "prisma generate"
-  },
-  "prisma": {
-    "seed": "node -r ts-node/register prisma/seed.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "2.10.0",
@@ -33,6 +30,7 @@
     "@fullcalendar/rrule": "^6.1.15",
     "@fullcalendar/timegrid": "^6.1.15",
     "@mui/icons-material": "^7.3.1",
+    "@mui/lab": "^7.0.0-beta.16",
     "@mui/material": "^7.3.1",
     "@prisma/client": "6.13.0",
     "@react-jvectormap/core": "^1.0.4",
@@ -70,8 +68,8 @@
     "eslint-config-next": "15.1.3",
     "postcss": "^8",
     "tailwindcss": "^4.0.0",
-    "typescript": "^5",
-    "ts-node": "^10.9.2"
+    "ts-node": "^10.9.2",
+    "typescript": "^5"
   },
   "overrides": {
     "@react-jvectormap/core": {

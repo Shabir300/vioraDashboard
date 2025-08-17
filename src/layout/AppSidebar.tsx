@@ -32,25 +32,21 @@ const navItems: NavItem[] = [
     name: "Dashboard",
     subItems: [{ name: "Ecommerce", path: "/", pro: false }],
   },
+
   {
     icon: <CalenderIcon />,
     name: "Calendar",
-    path: "/calendar",
+    path: "/mui-calendar",
   },
   {
-    icon: <CalenderIcon />,
-    name: "MUI Calendar",
-    path: "/mui-calendar",
+    icon: <GridIcon />,
+    name: "Pipelines",
+    path: "/pipeline-tab",
   },
   {
     icon: <UserCircleIcon />,
     name: "User Profile",
     path: "/profile",
-  },
-  {
-    icon: <GridIcon />,
-    name: "Pipeline",
-    path: "/pipeline",
   },
 
   {
