@@ -12,9 +12,13 @@ interface ContextMenuProps {
   data?: Node | Edge;
   onClose: () => void;
   onAddNode?: (type: NodeType, position: { x: number; y: number }) => void;
+  onDeleteNode?: (nodeId: string) => void;
+  onDeleteEdge?: (edgeId: string) => void;
+  onToggleCollapse?: (nodeId: string) => void;
 }
 
-export function ContextMenu({ type, position, data, onClose, onAddNode }: ContextMenuProps) {
+export function ContextMenu({ type, position, data, onClose, onAddNode, onDeleteNode, onDeleteEdge, onToggleCollapse }: ContextMenuProps) {
+
   const handleNodeTypeSelect = useCallback(
     (nodeType: NodeType) => {
       if (onAddNode) {
@@ -34,6 +38,15 @@ export function ContextMenu({ type, position, data, onClose, onAddNode }: Contex
     <>
       <button
         onClick={() => {
+          if (data?.id && onToggleCollapse) onToggleCollapse(String(data.id));
+          onClose();
+        }}
+        className="w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700"
+      >
+        Toggle Collapse
+      </button>
+      <button
+        onClick={() => {
           // Handle rename
           onClose();
         }}
@@ -43,7 +56,7 @@ export function ContextMenu({ type, position, data, onClose, onAddNode }: Contex
       </button>
       <button
         onClick={() => {
-          // Handle delete
+          if (data?.id && onDeleteNode) onDeleteNode(String(data.id));
           onClose();
         }}
         className="w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700 text-red-500"
@@ -56,7 +69,7 @@ export function ContextMenu({ type, position, data, onClose, onAddNode }: Contex
   const renderEdgeMenu = () => (
     <button
       onClick={() => {
-        // Handle delete
+        if (data?.id && onDeleteEdge) onDeleteEdge(String(data.id));
         onClose();
       }}
       className="w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700 text-red-500"

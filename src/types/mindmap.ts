@@ -21,12 +21,21 @@ export interface MindMapNodeData {
   backgroundColor?: string;
   borderColor?: string;
   textColor?: string;
+  description?: string;
+  isRoot?: boolean;
+  collapsed?: boolean;
+  icon?: string;
 }
 
 export type MindMapNode = Node<MindMapNodeData>;
 
 export interface MindMapEdgeData {
   label?: string;
+  style?: {
+    dashed?: boolean;
+    thickness?: number; // stroke width
+    color?: string;
+  };
 }
 
 export type MindMapEdge = Edge<MindMapEdgeData>;

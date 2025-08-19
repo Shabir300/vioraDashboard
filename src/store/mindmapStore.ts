@@ -10,6 +10,8 @@ interface BoardState {
   error: string | null;
   snapToGrid: boolean;
   gridSize: number;
+  showGrid: boolean;
+  layoutMode: 'free' | 'tree';
   setNodes: (nodes: MindMapNode[]) => void;
   setEdges: (edges: MindMapEdge[]) => void;
   setSelectedNode: (nodeId: string | null) => void;
@@ -18,6 +20,8 @@ interface BoardState {
   setError: (error: string | null) => void;
   setSnapToGrid: (snap: boolean) => void;
   setGridSize: (size: number) => void;
+  setShowGrid: (show: boolean) => void;
+  setLayoutMode: (mode: 'free' | 'tree') => void;
   addNode: (type: NodeType, position: { x: number; y: number }) => void;
   updateNode: (nodeId: string, updates: Partial<MindMapNode>) => void;
   removeNode: (nodeId: string) => void;
@@ -36,6 +40,8 @@ export const useBoardStore = create<BoardState>((set) => ({
   error: null,
   snapToGrid: true,
   gridSize: 15,
+  showGrid: true,
+  layoutMode: 'free',
 
   setNodes: (nodes) => set({ nodes, isDirty: true }),
   setEdges: (edges) => set({ edges, isDirty: true }),
@@ -45,6 +51,8 @@ export const useBoardStore = create<BoardState>((set) => ({
   setError: (error) => set({ error }),
   setSnapToGrid: (snap) => set({ snapToGrid: snap }),
   setGridSize: (size) => set({ gridSize: size }),
+  setShowGrid: (show) => set({ showGrid: show }),
+  setLayoutMode: (mode) => set({ layoutMode: mode }),
 
   addNode: (type, position) =>
     set((state) => ({

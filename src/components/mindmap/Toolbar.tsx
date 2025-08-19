@@ -7,6 +7,8 @@ import { jsPDF } from 'jspdf';
 import { useUndoRedo } from '@/hooks/mindmap/useUndoRedo';
 import { ShapesTab } from './ShapesTab';
 import { NodeType, MindMapNode, MindMapEdge } from '@/types/mindmap';
+import { Templates } from './Templates';
+import { useBoardStore } from '@/store/mindmapStore';
 
 interface ToolbarProps {
   onSave: () => Promise<void>;
@@ -18,6 +20,7 @@ interface ToolbarProps {
   onAddNode: (type: NodeType, position?: { x: number; y: number }) => void;
   snapToGrid: boolean;
   setSnapToGrid: (snap: boolean) => void;
+  exportRef?: React.RefObject<HTMLDivElement>;
 }
 
 export function Toolbar({
@@ -33,9 +36,11 @@ export function Toolbar({
 }: ToolbarProps) {
   const [nodeType, setNodeType] = useState<NodeType>('text');
   const [showShapes, setShowShapes] = useState(false);
+  const [showTemplates, setShowTemplates] = useState(false);
   const reactFlowInstance = useReactFlow();
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const { undo, redo, canUndo, canRedo } = useUndoRedo(nodes, edges, setNodes, setEdges);
+  const { showGrid, setShowGrid, layoutMode, setLayoutMode } = useBoardStore();
 
   const handleZoom = useCallback((type: 'in' | 'out' | 'fit') => {
     if (type === 'in') {
@@ -48,14 +53,15 @@ export function Toolbar({
   }, [reactFlowInstance]);
 
   const handleExport = useCallback(async (format: 'png' | 'svg' | 'pdf') => {
-    if (!reactFlowWrapper.current) return;
+    const host = reactFlowWrapper.current || (document.querySelector('.react-flow') as HTMLDivElement) || undefined;
+    if (!host) return;
 
     try {
       const scale = 2; // Higher resolution
       const options = {
         backgroundColor: '#ffffff',
-        width: reactFlowWrapper.current.offsetWidth * scale,
-        height: reactFlowWrapper.current.offsetHeight * scale,
+        width: host.offsetWidth * scale,
+        height: host.offsetHeight * scale,
         style: {
           transform: `scale(${scale})`,
           transformOrigin: 'top left',
@@ -64,7 +70,7 @@ export function Toolbar({
 
       switch (format) {
         case 'png': {
-          const dataUrl = await toPng(reactFlowWrapper.current, options);
+          const dataUrl = await toPng(host, options as any);
           const link = document.createElement('a');
           link.href = dataUrl;
           link.download = 'mindmap.png';
@@ -72,7 +78,7 @@ export function Toolbar({
           break;
         }
         case 'svg': {
-          const dataUrl = await toSvg(reactFlowWrapper.current, options);
+          const dataUrl = await toSvg(host, options as any);
           const link = document.createElement('a');
           link.href = dataUrl;
           link.download = 'mindmap.svg';
@@ -80,7 +86,7 @@ export function Toolbar({
           break;
         }
         case 'pdf': {
-          const dataUrl = await toPng(reactFlowWrapper.current, options);
+          const dataUrl = await toPng(host, options as any);
           const pdf = new jsPDF({
             orientation: 'landscape',
             unit: 'px',
@@ -111,6 +117,13 @@ export function Toolbar({
   return (
     <div className="flex items-center space-x-2 bg-white dark:bg-gray-800 p-2 rounded-lg shadow-lg">
       <div className="flex items-center space-x-2 border-r pr-2">
+        <button
+          onClick={() => onAddNode('text')}
+          className="px-3 py-1 text-sm font-medium rounded bg-blue-500 text-white hover:bg-blue-600"
+          title="Add Node"
+        >
+          + Node
+        </button>
         <div className="relative">
           <button
             onClick={() => setShowShapes(!showShapes)}
@@ -142,6 +155,34 @@ export function Toolbar({
         >
           Add Text
         </button>
+
+        <div className="relative">
+          <button
+            onClick={() => setShowTemplates(!showTemplates)}
+            className="px-3 py-1 text-sm font-medium rounded bg-indigo-500 text-white hover:bg-indigo-600"
+          >
+            Templates
+          </button>
+          {showTemplates && (
+            <div className="absolute top-full left-0 mt-1 z-50 w-56 bg-white dark:bg-gray-800 rounded shadow-lg p-2 space-y-1">
+              {Object.keys(Templates).map((name) => (
+                <button
+                  key={name}
+                  onClick={() => {
+                    const center = reactFlowInstance.screenToFlowPosition({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
+                    const tpl = Templates[name].build(center);
+                    setNodes([...nodes, ...tpl.nodes]);
+                    setEdges([...edges, ...tpl.edges]);
+                    setShowTemplates(false);
+                  }}
+                  className="block w-full text-left px-3 py-1 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                >
+                  {name}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="flex items-center space-x-2 border-r pr-2">
@@ -185,6 +226,28 @@ export function Toolbar({
             />
             <span>Snap to Grid</span>
           </label>
+        </div>
+
+        <div className="border-l pl-2">
+          <label className="flex items-center space-x-2 text-sm">
+            <input
+              type="checkbox"
+              checked={showGrid}
+              onChange={(e) => setShowGrid(e.target.checked)}
+              className="form-checkbox h-4 w-4"
+            />
+            <span>Grid</span>
+          </label>
+        </div>
+
+        <div className="border-l pl-2">
+          <button
+            onClick={() => setLayoutMode(layoutMode === 'free' ? 'tree' : 'free')}
+            className="px-3 py-1 text-sm font-medium rounded bg-gray-100 text-gray-700 hover:bg-gray-200"
+            title="Toggle Layout"
+          >
+            {layoutMode === 'free' ? 'Tree Layout' : 'Freeform'}
+          </button>
         </div>
       </div>
 
@@ -258,6 +321,41 @@ export function Toolbar({
               PDF
             </button>
           </div>
+        </div>
+
+        <div className="border-l pl-2 flex items-center space-x-2">
+          <button
+            onClick={() => {
+              const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify({ nodes, edges }));
+              const link = document.createElement('a');
+              link.href = dataStr;
+              link.download = 'mindmap.json';
+              link.click();
+            }}
+            className="px-3 py-1 text-sm font-medium rounded bg-gray-100 text-gray-700 hover:bg-gray-200"
+          >
+            Export JSON
+          </button>
+          <label className="px-3 py-1 text-sm font-medium rounded bg-gray-100 text-gray-700 hover:bg-gray-200 cursor-pointer">
+            Import JSON
+            <input
+              type="file"
+              accept="application/json"
+              className="hidden"
+              onChange={async (e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                const text = await file.text();
+                try {
+                  const parsed = JSON.parse(text);
+                  if (Array.isArray(parsed.nodes) && Array.isArray(parsed.edges)) {
+                    setNodes(parsed.nodes);
+                    setEdges(parsed.edges);
+                  }
+                } catch {}
+              }}
+            />
+          </label>
         </div>
       </div>
     </div>

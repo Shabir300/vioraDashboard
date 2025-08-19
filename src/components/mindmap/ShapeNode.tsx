@@ -44,8 +44,8 @@ export function ShapeNode({ data, selected, id }: NodeProps<MindMapNode['data']>
 
   const handleBlur = useCallback(() => {
     setIsEditing(false);
-    // TODO: Call update function from context/store
-  }, []);
+    data.onChange?.(label);
+  }, [label, data]);
 
   const style = {
     width: data.width || defaultSizes[data.type].width,

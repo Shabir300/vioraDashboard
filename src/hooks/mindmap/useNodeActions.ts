@@ -22,10 +22,10 @@ export function useNodeActions({
 
   const addNode = useCallback(
     (type: NodeType, position?: { x: number; y: number }) => {
-      const pos = position || {
+      const pos = position || project({
         x: window.innerWidth / 2,
         y: window.innerHeight / 2,
-      };
+      });
 
       const newNode: MindMapNode = {
         id: `node-${Date.now()}`,
@@ -36,6 +36,7 @@ export function useNodeActions({
           type,
           width: 150,
           height: 40,
+          collapsed: false,
         },
       };
 
@@ -66,6 +67,8 @@ export function useNodeActions({
 
   const deleteNode = useCallback(
     (nodeId: string) => {
+      const nodeToDelete = nodes.find((n) => n.id === nodeId);
+      if (nodeToDelete?.data?.isRoot) return; // undeletable root
       setNodes(nodes.filter((node) => node.id !== nodeId));
       setEdges(edges.filter((edge) => edge.source !== nodeId && edge.target !== nodeId));
     },
