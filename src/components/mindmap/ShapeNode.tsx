@@ -33,7 +33,7 @@ const defaultSizes: Record<NodeType, { width: number; height: number }> = {
   sticky: { width: 150, height: 150 },
 };
 
-export function ShapeNode({ data, selected }: NodeProps<MindMapNode['data']>) {
+export function ShapeNode({ data, selected, id }: NodeProps<MindMapNode['data']>) {
   const [isEditing, setIsEditing] = useState(false);
   const [label, setLabel] = useState(data.label);
 
@@ -44,6 +44,7 @@ export function ShapeNode({ data, selected }: NodeProps<MindMapNode['data']>) {
 
   const handleBlur = useCallback(() => {
     setIsEditing(false);
+    // TODO: Call update function from context/store
   }, []);
 
   const style = {
@@ -55,59 +56,37 @@ export function ShapeNode({ data, selected }: NodeProps<MindMapNode['data']>) {
   };
 
   return (
-    <div className="shape-node-wrapper">
-      <NodeResizer isVisible={selected} minWidth={60} minHeight={40} />
+    <>
+      <NodeResizer
+        isVisible={selected}
+        minWidth={60}
+        minHeight={40}
+      />
       <div
         className={`
-          flex items-center justify-center relative
+          border-2 flex items-center justify-center p-4
+          transition-shadow duration-200
+          ${shapeStyles[data.type]}
           ${selected ? 'shadow-lg' : 'shadow-md'}
         `}
-        style={{
-          width: style.width,
-          height: style.height,
-        }}
+        style={style}
+        onDoubleClick={handleDoubleClick}
       >
-        <div
-          className={`
-            absolute inset-0
-            border-2
-            flex items-center justify-center
-            bg-white dark:bg-gray-800
-            overflow-hidden
-            ${shapeStyles[data.type]}
-          `}
-          style={{
-            borderColor: style.borderColor,
-            backgroundColor: style.backgroundColor,
-          }}
-          onDoubleClick={handleDoubleClick}
-        >
-          <div
-            className={`
-              w-full h-full
-              flex items-center justify-center
-              ${data.type === 'diamond' ? '-rotate-45' : ''}
-              px-4
-            `}
-          >
-            {isEditing ? (
-              <input
-                type="text"
-                value={label}
-                onChange={(e) => setLabel(e.target.value)}
-                onBlur={handleBlur}
-                className="w-full bg-transparent text-center focus:outline-none"
-                style={{ color: style.color }}
-                autoFocus
-              />
-            ) : (
-              <div className="w-full text-center" style={{ color: style.color }}>
-                {label}
-              </div>
-            )}
+        {isEditing ? (
+          <input
+            type="text"
+            value={label}
+            onChange={(e) => setLabel(e.target.value)}
+            onBlur={handleBlur}
+            className="w-full h-full bg-transparent text-center focus:outline-none"
+            autoFocus
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-center">
+            {label}
           </div>
-        </div>
+        )}
       </div>
-    </div>
+    </>
   );
 }
